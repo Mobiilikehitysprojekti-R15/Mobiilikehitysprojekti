@@ -161,15 +161,32 @@ export default function Weathertest() {
 
                     <View style={styles.container}>
 
-                        <Text style={styles.lowerTitle}>Minutely 15 Weather:</Text>
-                        <Text style={styles.explanationText}>Wind Gusts 10m (Next 15min intervals for next 8 hours):</Text>
+                        <Text style={styles.lowerTitle}>Wind gust forecast:</Text>
+                        <Text style={styles.explanationText}>Wind Gusts (next 8 hours):</Text>
 
                         <LineChart
                             data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
                                 .map((item, newIndex) => ({ value: item.value,  label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
+
+                            data2={Array(24).fill({ value: 8})}
+                            data3={Array(24).fill({ value: 11})}
+                            color2='yellow'
+                            color3='red'
+
+                            thickness1={4}
+                            color1='blue'
+
+                            thickness2={4}
+                            thickness3={4}
+
                             height={200}
                             adjustToWidth={true}
                             width={250}
+                            
+
+                            areaChart1={true}
+                            startFillColor={'blue'}
+
                             yAxisLabelSuffix='m/s'
                             noOfSections={5}
                             hideDataPoints={true}
@@ -208,8 +225,24 @@ export default function Weathertest() {
                         <LineChart
                             data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
                                 .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
+                            data2={Array(24).fill({ value: 8})}
+                            data3={Array(24).fill({ value: 11})}
+                            color2='yellow'
+                            color3='red'
+
+                            thickness1={4}
+                            color1='blue'
+
+                            thickness2={4}
+                            thickness3={4}
+
+                            areaChart1={true}
+                            startFillColor={'blue'}
                             hideDataPoints={true}
                             width={250}
+                            showReferenceLine1={true}
+                            referenceLine1Position={8}
+                            
                             height={200}
                             adjustToWidth={true}
                             yAxisLabelSuffix='m/s'

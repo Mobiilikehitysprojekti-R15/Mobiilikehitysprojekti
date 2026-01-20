@@ -4,7 +4,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import  WeatherTest from "./screens/Weathertest";
 
-/*
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -13,15 +13,15 @@ export default function App() {
     </NavigationContainer>
   );
 }
-*/
 
+/*
 export default function App() {
   return (
     <NavigationContainer>
       <WeatherTest />
     </NavigationContainer>
   );
-}
+}*/
 
 const styles = StyleSheet.create({
   container: {

@@ -3,6 +3,7 @@ import React from 'react'
 import { fetchWeatherApi } from 'openmeteo';
 import { useEffect } from 'react';
 import { LineChart } from 'react-native-gifted-charts';
+import { currentWeather, hourlyWeather, fifteenMinuteWeather } from '../types/WeatherTypes';
 
 
 const params = {
@@ -22,70 +23,12 @@ const params = {
     forecast_minutely_15: 48,
 };
 
-type currentWeatherParams = {
-    time?: Date,
-    wind_gusts_10m?: number,
-    wind_direction_10m?: number,
-    wind_speed_10m?: number,
-    cloud_cover?: number,
-    weather_code?: number,
-}
-
-type hourlyWeatherParams = {
-    time: Date[],
-    temperature_2m: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_1000hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_950hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_925hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_850hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_700hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_600hPa: Float32Array<ArrayBufferLike> | null | undefined,
-    weather_code: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_10m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_80m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_120m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_180m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_10m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_80m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_120m?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_180m?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_1000hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_975hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_950hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_925hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_900hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_850hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_800hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_700hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    cloud_cover_600hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_975hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_900hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_800hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_800hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_850hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_900hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_925hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_950hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_975hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_1000hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_700hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_600hPa?: Float32Array<ArrayBufferLike> | null | undefined,
-}
-
-type minutelyWeatherParams = {
-    time: Date[],
-    wind_speed_10m: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_speed_80m: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_10m: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_direction_80m: Float32Array<ArrayBufferLike> | null | undefined,
-    wind_gusts_10m: Float32Array<ArrayBufferLike> | null | undefined,
-}
 
 export default function Weathertest() {
 
-    const [current, setCurrent] = React.useState<currentWeatherParams | null>(null);
-    const [hourly, setHourly] = React.useState<hourlyWeatherParams | null>(null);
-    const [minutely15, setMinutely15] = React.useState<minutelyWeatherParams | null>(null);
+    const [current, setCurrent] = React.useState<currentWeather | null>(null);
+    const [hourly, setHourly] = React.useState<hourlyWeather | null>(null);
+    const [minutely15, setMinutely15] = React.useState<fifteenMinuteWeather | null>(null);
 
     useEffect(() => {
         const url = "https://api.open-meteo.com/v1/forecast";

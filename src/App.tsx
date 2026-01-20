@@ -14,14 +14,6 @@ export default function App() {
   );
 }
 
-/*
-export default function App() {
-  return (
-    <NavigationContainer>
-      <WeatherTest />
-    </NavigationContainer>
-  );
-}*/
 
 const styles = StyleSheet.create({
   container: {

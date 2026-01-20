@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { fetchWeatherApi } from 'openmeteo';
 import { useEffect } from 'react';
+import { LineChart } from 'react-native-gifted-charts';
 
 
 const params = {
@@ -182,46 +183,43 @@ export default function Weathertest() {
     return (
         <View style={styles.rootContainer}>
             <Text style={styles.title}>Weathertest</Text>
-            <Text style={styles.lowerTitle}>Current Weather:</Text>
+            <Text>Fetching weather data for latitude: {params.latitude}, longitude: {params.longitude}</Text>
+            
+            
+            {minutely15 && (
+                
+                <View style={styles.container}>
+
+                    <Text style={styles.lowerTitle}>Minutely 15 Weather:</Text>
+                    <Text>Wind Speed 10m (Next 15min intervals for next 8 hours):</Text>
+
+                    <LineChart
+                        data={minutely15.wind_speed_10m ? Array.from(minutely15.wind_speed_10m).slice(0, 31).map((value, index) => ({ value })) : []}
+                        adjustToWidth={true}
+                        height={200}
+                        hideRules={false}
+                        hideAxesAndRules={false}
+                        yAxisColor={'black'}
+                        xAxisColor={'black'}
+                        yAxisTextStyle={{ color: 'black' }}
+                        spacing={9}
+                        initialSpacing={0}
+                        />
+                    
+                </View>
+            )}
+
+
+            
             {current && (
                 <View style={styles.container}>
+                    <Text style={styles.lowerTitle}>Current Weather:</Text>
                     <Text>Time: {current.time?.toString()}</Text>
                     <Text>Wind Gusts 10m: {current.wind_gusts_10m}</Text>
                     <Text>Wind Direction 10m: {current.wind_direction_10m}</Text>
                     <Text>Wind Speed 10m: {current.wind_speed_10m}</Text>
                     <Text>Cloud Cover: {current.cloud_cover}</Text>
                     <Text>Weather Code: {current.weather_code}</Text>
-                </View>
-            )}
-            <Text>Hourly Weather Data Loaded: {hourly ? "Yes" : "No"}</Text>
-            {hourly && (
-                <View style={styles.container}>
-                    <Text>Number of Hourly Entries: {hourly.time.length}</Text>
-
-                    <Text>First Hourly Entry:</Text>
-                    <Text>Time: {hourly.time[0].toString()}</Text>
-                    <Text>Temperature 2m: {hourly.temperature_2m ? hourly.temperature_2m[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 1000hPa: {hourly.wind_speed_1000hPa ? hourly.wind_speed_1000hPa[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 950hPa: {hourly.wind_speed_950hPa ? hourly.wind_speed_950hPa[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 925hPa: {hourly.wind_speed_925hPa ? hourly.wind_speed_925hPa[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 850hPa: {hourly.wind_speed_850hPa ? hourly.wind_speed_850hPa[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 700hPa: {hourly.wind_speed_700hPa ? hourly.wind_speed_700hPa[0] : 'N/A'}</Text>
-                    <Text>Wind Speed 600hPa: {hourly.wind_speed_600hPa ? hourly.wind_speed_600hPa[0] : 'N/A'}</Text>
-                    <Text>Weather Code: {hourly.weather_code ? hourly.weather_code[0] : 'N/A'}</Text>
-
-                </View>
-            )}
-            <Text>Minutely 15 Weather Data Loaded: {minutely15 ? "Yes" : "No"}</Text>
-            {minutely15 && (
-                <View style={styles.container}>
-                    <Text>Number of Minutely 15 Entries: {minutely15.time.length}</Text>
-                    <Text>Second Minutely 15 Entry:</Text>
-                    <Text>Time: {minutely15.time[1].toString()}</Text>
-                    <Text>Wind Speed 10m: {minutely15.wind_speed_10m ? minutely15.wind_speed_10m[1] : 'N/A'}</Text>
-                    <Text>Wind Speed 80m: {minutely15.wind_speed_80m ? minutely15.wind_speed_80m[1] : 'N/A'}</Text>
-                    <Text>Wind Direction 10m: {minutely15.wind_direction_10m ? minutely15.wind_direction_10m[1] : 'N/A'}</Text>
-                    <Text>Wind Direction 80m: {minutely15.wind_direction_80m ? minutely15.wind_direction_80m[1] : 'N/A'}</Text>
-                    <Text>Wind Gusts 10m: {minutely15.wind_gusts_10m ? minutely15.wind_gusts_10m[1] : 'N/A'}</Text>
                 </View>
             )}
 
@@ -233,8 +231,9 @@ export default function Weathertest() {
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        marginHorizontal: 20,
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         marginTop: 70,
     },
     container: {
@@ -249,6 +248,5 @@ const styles = StyleSheet.create({
     lowerTitle:{
         fontSize: 16,
         fontWeight: 'bold',
-    }
-
+    },
 })

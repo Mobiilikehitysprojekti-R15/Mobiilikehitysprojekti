@@ -26,6 +26,7 @@ export type hourlyWeather = {
     wind_direction_80m?: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_120m?: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_180m?: Float32Array<ArrayBufferLike> | null | undefined,
+    wind_gusts_10m?: Float32Array<ArrayBufferLike> | null | undefined,
     cloud_cover_1000hPa?: Float32Array<ArrayBufferLike> | null | undefined,
     cloud_cover_975hPa?: Float32Array<ArrayBufferLike> | null | undefined,
     cloud_cover_950hPa?: Float32Array<ArrayBufferLike> | null | undefined,
@@ -53,7 +54,9 @@ export type fifteenMinuteWeather = {
     time: Date[],
     wind_speed_10m: Float32Array<ArrayBufferLike> | null | undefined,
     wind_speed_80m: Float32Array<ArrayBufferLike> | null | undefined,
+    wind_speed_120m: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_10m: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_80m: Float32Array<ArrayBufferLike> | null | undefined,
     wind_gusts_10m: Float32Array<ArrayBufferLike> | null | undefined,
+    visibility: Float32Array<ArrayBufferLike> | null | undefined,
 }

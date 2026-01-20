@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { fetchWeatherApi } from 'openmeteo';
 import { useEffect } from 'react';
-import { LineChart } from 'react-native-gifted-charts';
+import { BarChart, LineChart, lineDataItem } from 'react-native-gifted-charts';
 import { currentWeather, hourlyWeather, fifteenMinuteWeather } from '../types/WeatherTypes';
 
 
@@ -18,7 +18,7 @@ const params = {
         "wind_direction_1000hPa", "wind_direction_700hPa", "wind_direction_600hPa"],
 
     current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code"],
-    minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m"],
+    minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m", "visibility"],
     wind_speed_unit: "ms",
     forecast_minutely_15: 48,
 };
@@ -103,10 +103,11 @@ export default function Weathertest() {
                         ),
                         wind_speed_10m: minutely15.variables(0)!.valuesArray(),
                         wind_speed_80m: minutely15.variables(1)!.valuesArray(),
-                        wind_direction_10m: minutely15.variables(2)!.valuesArray(),
-                        wind_direction_80m: minutely15.variables(3)!.valuesArray(),
-                        wind_gusts_10m: minutely15.variables(4)!.valuesArray(),
-                        visibility: minutely15.variables(5)!.valuesArray(),
+                        wind_speed_120m: minutely15.variables(2)!.valuesArray(),
+                        wind_direction_10m: minutely15.variables(3)!.valuesArray(),
+                        wind_direction_80m: minutely15.variables(4)!.valuesArray(),
+                        wind_gusts_10m: minutely15.variables(5)!.valuesArray(),
+                        visibility: minutely15.variables(6)!.valuesArray(),
                     }
                 };
 
@@ -123,50 +124,111 @@ export default function Weathertest() {
     }, []);
 
 
+    const filterCloseValuesWithIndex = (
+        values: number[],
+        threshold: number
+    ): Array<{ value: number; index: number }> => {
+        if (values.length <= 1) return values.map((v, i) => ({ value: v, index: i }));
+
+        const filtered: Array<{ value: number; index: number }> = [{ value: values[0], index: 0 }];
+
+        for (let i = 1; i < values.length; i++) {
+            if (Math.abs(values[i] - filtered[filtered.length - 1].value) > threshold) {
+                filtered.push({ value: values[i], index: i });
+            }
+        }
+
+        return filtered;
+    };
+
+    const getTimeLabels = (dates: Date[]): string[] => {
+        return dates.map(date => {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        });
+    };
+
+
     return (
-        <View style={styles.rootContainer}>
-            <Text style={styles.title}>Weathertest</Text>
-            <Text>Fetching weather data for latitude: {params.latitude}, longitude: {params.longitude}</Text>
-            
-            
-            {minutely15 && (
-                
-                <View style={styles.container}>
+        <ScrollView>
+            <View style={styles.rootContainer}>
+                <Text style={styles.title}>Weathertest</Text>
+                <Text>Fetching weather data for latitude: {params.latitude}, longitude: {params.longitude}</Text>
 
-                    <Text style={styles.lowerTitle}>Minutely 15 Weather:</Text>
-                    <Text>Wind Speed 10m (Next 15min intervals for next 8 hours):</Text>
 
-                    <LineChart
-                        data={minutely15.wind_speed_10m ? Array.from(minutely15.wind_speed_10m).slice(0, 31).map((value, index) => ({ value })) : []}
-                        adjustToWidth={true}
-                        height={200}
-                        hideRules={false}
-                        hideAxesAndRules={false}
-                        yAxisColor={'black'}
-                        xAxisColor={'black'}
-                        yAxisTextStyle={{ color: 'black' }}
-                        spacing={9}
-                        initialSpacing={0}
+                {minutely15 && (
+
+                    <View style={styles.container}>
+
+                        <Text style={styles.lowerTitle}>Minutely 15 Weather:</Text>
+                        <Text style={styles.explanationText}>Wind Gusts 10m (Next 15min intervals for next 8 hours):</Text>
+
+                        <LineChart
+                            data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
+                                .map((item, newIndex) => ({ value: item.value,  label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
+                            height={200}
+                            adjustToWidth={true}
+                            width={250}
+                            yAxisLabelSuffix='m/s'
+                            noOfSections={5}
+                            hideDataPoints={true}
+                            xAxisLabelTextStyle={{ fontSize: 10 }}
+                            allowFontScaling={true}
+                            yAxisLabelWidth={70}
+                            hideRules={false}
+                            hideAxesAndRules={false}
+                            yAxisColor={'black'}
+                            xAxisColor={'black'}
+                            yAxisTextStyle={{ color: 'black' }}
+                            initialSpacing={0}
                         />
-                    
-                </View>
-            )}
+
+                    </View>
+                )}
 
 
-            
-            {current && (
-                <View style={styles.container}>
-                    <Text style={styles.lowerTitle}>Current Weather:</Text>
-                    <Text>Time: {current.time?.toString()}</Text>
-                    <Text>Wind Gusts 10m: {current.wind_gusts_10m}</Text>
-                    <Text>Wind Direction 10m: {current.wind_direction_10m}</Text>
-                    <Text>Wind Speed 10m: {current.wind_speed_10m}</Text>
-                    <Text>Cloud Cover: {current.cloud_cover}</Text>
-                    <Text>Weather Code: {current.weather_code}</Text>
-                </View>
-            )}
 
-        </View>
+                {current && (
+                    <View style={styles.container}>
+                        <Text style={styles.lowerTitle}>Current Weather:</Text>
+                        <Text>Time: {current.time?.toString()}</Text>
+                        <Text>Wind Gusts 10m: {current.wind_gusts_10m}</Text>
+                        <Text>Wind Direction 10m: {current.wind_direction_10m}</Text>
+                        <Text>Wind Speed 10m: {current.wind_speed_10m}</Text>
+                        <Text>Cloud Cover: {current.cloud_cover}</Text>
+                        <Text>Weather Code: {current.weather_code}</Text>
+                    </View>
+                )}
+
+                {hourly && (
+                    <View style={styles.container}>
+                        <Text style={styles.lowerTitle}>Hourly Weather:</Text>
+                        <Text style={styles.explanationText}>Wind gusts 10m (previus 24 hours):</Text>
+                        <LineChart
+                            data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
+                                .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
+                            hideDataPoints={true}
+                            width={250}
+                            height={200}
+                            adjustToWidth={true}
+                            yAxisLabelSuffix='m/s'
+                            xAxisLabelTextStyle={{ fontSize: 10 }}
+                            xAxisTextNumberOfLines={2}
+                            allowFontScaling={true}
+                            yAxisLabelWidth={70}
+                            noOfSections={4}
+                            hideRules={false}
+                            hideAxesAndRules={false}
+                            yAxisColor={'black'}
+                            xAxisColor={'black'}
+                            yAxisTextStyle={{ color: 'black' }}
+                            initialSpacing={0}
+                        />
+                    </View>
+                )}
+            </View>
+        </ScrollView>
     )
 }
 
@@ -192,4 +254,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    explanationText:{
+        marginBottom: 10,
+    }
 })

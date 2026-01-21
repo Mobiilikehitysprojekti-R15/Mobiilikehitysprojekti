@@ -200,7 +200,7 @@ export default function WeatherScreen() {
 
     const isNight = (date: Date): boolean => {
         const hours = date.getHours();
-        return hours < 6 || hours > 20;
+        return hours < 6 || hours > 22;
     }
 
     const isJumpSafe = (): boolean | null => {

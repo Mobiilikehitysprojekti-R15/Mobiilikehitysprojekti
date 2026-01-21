@@ -6,119 +6,161 @@ import { BarChart, LineChart, lineDataItem } from 'react-native-gifted-charts';
 import { currentWeather, hourlyWeather, fifteenMinuteWeather } from '../types/WeatherTypes';
 
 
-const params = {
-    latitude: 64.9301,
-    longitude: 25.3546,
-    hourly: ["temperature_2m", "wind_speed_1000hPa", "wind_speed_950hPa", "wind_speed_925hPa", "wind_speed_700hPa",
-        "wind_speed_600hPa", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m",
-        "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "cloud_cover_1000hPa", "cloud_cover_975hPa",
-        "cloud_cover_950hPa", "cloud_cover_925hPa", "cloud_cover_900hPa", "cloud_cover_850hPa", "cloud_cover_800hPa", "cloud_cover_700hPa",
-        "cloud_cover_600hPa", "wind_speed_975hPa", "wind_speed_900hPa", "wind_speed_800hPa", "wind_speed_850hPa", "wind_direction_800hPa",
-        "wind_direction_850hPa", "wind_direction_900hPa", "wind_direction_925hPa", "wind_direction_950hPa", "wind_direction_975hPa",
-        "wind_direction_1000hPa", "wind_direction_700hPa", "wind_direction_600hPa"],
 
-    current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code"],
-    minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m", "visibility"],
-    wind_speed_unit: "ms",
-    forecast_minutely_15: 48,
-};
+
 
 
 export default function WeatherScreen() {
+
+
+
+    const LOCATION : string = "EFOU"; //Oulun lentoasema ICAO koodi
 
     const [current, setCurrent] = React.useState<currentWeather | null>(null);
     const [hourly, setHourly] = React.useState<hourlyWeather | null>(null);
     const [minutely15, setMinutely15] = React.useState<fifteenMinuteWeather | null>(null);
 
+    const [metarData, setMetarData] = React.useState<string>('');
+    const [getLatitude, setLatitude] = React.useState<number>(64.9301);
+    const [getLongitude, setLongitude] = React.useState<number>(25.3546);
+
     useEffect(() => {
-        const url = "https://api.open-meteo.com/v1/forecast";
-        const fetchData = async () => {
+
+        const metarUrl = `https://aviationweather.gov/api/data/metar?ids=${LOCATION}&format=json`;
+        //"https://metar-taf.com/api/metar.php?iata=KAO&format=json";
+
+        const getMetarData = async () => {
             try {
-                const data = await fetchWeatherApi(url, params);
+                const response = await fetch(metarUrl);
+                const data = await response.json();
+                console.log("METAR Data:", data);
 
-                const utcOffsetSeconds = data[0].utcOffsetSeconds();
+                //raaka metar data talteen
+                if (data && data[0] && data[0].rawOb) {
+                    setMetarData(data[0].rawOb);
 
-                const hourly = data[0].hourly()!;
-                const current = data[0].current()!;
-                const minutely15 = data[0].minutely15()!;
+                    //päivitetään koordinaatit metar datan perusteella
 
-                const weatherData = {
-                    current: {
-                        time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-                        wind_gusts_10m: current.variables(0)!.value(),
-                        wind_direction_10m: current.variables(1)!.value(),
-                        wind_speed_10m: current.variables(2)!.value(),
-                        cloud_cover: current.variables(3)!.value(),
-                        weather_code: current.variables(4)!.value(),
-                    },
-                    hourly: {
-                        time: Array.from(
-                            { length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
-                            (_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
-                        ),
-                        temperature_2m: hourly.variables(0)!.valuesArray(),
-                        wind_speed_1000hPa: hourly.variables(1)!.valuesArray(),
-                        wind_speed_950hPa: hourly.variables(2)!.valuesArray(),
-                        wind_speed_925hPa: hourly.variables(3)!.valuesArray(),
-                        wind_speed_700hPa: hourly.variables(4)!.valuesArray(),
-                        wind_speed_600hPa: hourly.variables(5)!.valuesArray(),
-                        weather_code: hourly.variables(6)!.valuesArray(),
-                        wind_speed_10m: hourly.variables(7)!.valuesArray(),
-                        wind_speed_80m: hourly.variables(8)!.valuesArray(),
-                        wind_speed_120m: hourly.variables(9)!.valuesArray(),
-                        wind_speed_180m: hourly.variables(10)!.valuesArray(),
-                        wind_direction_10m: hourly.variables(11)!.valuesArray(),
-                        wind_direction_80m: hourly.variables(12)!.valuesArray(),
-                        wind_direction_120m: hourly.variables(13)!.valuesArray(),
-                        wind_direction_180m: hourly.variables(14)!.valuesArray(),
-                        wind_gusts_10m: hourly.variables(15)!.valuesArray(),
-                        cloud_cover_1000hPa: hourly.variables(16)!.valuesArray(),
-                        cloud_cover_975hPa: hourly.variables(17)!.valuesArray(),
-                        cloud_cover_950hPa: hourly.variables(18)!.valuesArray(),
-                        cloud_cover_925hPa: hourly.variables(19)!.valuesArray(),
-                        cloud_cover_900hPa: hourly.variables(20)!.valuesArray(),
-                        cloud_cover_850hPa: hourly.variables(21)!.valuesArray(),
-                        cloud_cover_800hPa: hourly.variables(22)!.valuesArray(),
-                        cloud_cover_700hPa: hourly.variables(23)!.valuesArray(),
-                        cloud_cover_600hPa: hourly.variables(24)!.valuesArray(),
-                        wind_speed_975hPa: hourly.variables(25)!.valuesArray(),
-                        wind_speed_900hPa: hourly.variables(26)!.valuesArray(),
-                        wind_speed_800hPa: hourly.variables(27)!.valuesArray(),
-                        wind_speed_850hPa: hourly.variables(28)!.valuesArray(),
-                        wind_direction_800hPa: hourly.variables(29)!.valuesArray(),
-                        wind_direction_850hPa: hourly.variables(30)!.valuesArray(),
-                        wind_direction_900hPa: hourly.variables(31)!.valuesArray(),
-                        wind_direction_925hPa: hourly.variables(32)!.valuesArray(),
-                        wind_direction_950hPa: hourly.variables(33)!.valuesArray(),
-                        wind_direction_975hPa: hourly.variables(34)!.valuesArray(),
-                        wind_direction_1000hPa: hourly.variables(35)!.valuesArray(),
-                        wind_direction_700hPa: hourly.variables(36)!.valuesArray(),
-                        wind_direction_600hPa: hourly.variables(37)!.valuesArray(),
-
-                    },
-                    minutely_15:{
-                        time: Array.from(
-                            { length: (Number(minutely15.timeEnd()) - Number(minutely15.time())) / minutely15.interval() },
-                            (_, i) => new Date((Number(minutely15.time()) + i * minutely15.interval() + utcOffsetSeconds) * 1000)
-                        ),
-                        wind_speed_10m: minutely15.variables(0)!.valuesArray(),
-                        wind_speed_80m: minutely15.variables(1)!.valuesArray(),
-                        wind_speed_120m: minutely15.variables(2)!.valuesArray(),
-                        wind_direction_10m: minutely15.variables(3)!.valuesArray(),
-                        wind_direction_80m: minutely15.variables(4)!.valuesArray(),
-                        wind_gusts_10m: minutely15.variables(5)!.valuesArray(),
-                        visibility: minutely15.variables(6)!.valuesArray(),
-                    }
-                };
-
-                setCurrent(weatherData.current);
-                setHourly(weatherData.hourly);
-                setMinutely15(weatherData.minutely_15);
+                    setLatitude(data[0].lat);
+                    setLongitude(data[0].lon);
+                }
 
             } catch (error) {
-                console.error("Error fetching weather data:", error);
+                console.error("Error fetching METAR data:", error);
             }
         };
+
+        getMetarData();
+
+        const url = "https://api.open-meteo.com/v1/forecast";
+
+
+
+      const fetchData = async () => {
+        try {
+
+          const params = {
+            latitude: getLatitude,
+            longitude: getLongitude,
+            hourly: ["temperature_2m", "wind_speed_1000hPa", "wind_speed_950hPa", "wind_speed_925hPa", "wind_speed_700hPa",
+              "wind_speed_600hPa", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m",
+              "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "cloud_cover_1000hPa", "cloud_cover_975hPa",
+              "cloud_cover_950hPa", "cloud_cover_925hPa", "cloud_cover_900hPa", "cloud_cover_850hPa", "cloud_cover_800hPa", "cloud_cover_700hPa",
+              "cloud_cover_600hPa", "wind_speed_975hPa", "wind_speed_900hPa", "wind_speed_800hPa", "wind_speed_850hPa", "wind_direction_800hPa",
+              "wind_direction_850hPa", "wind_direction_900hPa", "wind_direction_925hPa", "wind_direction_950hPa", "wind_direction_975hPa",
+              "wind_direction_1000hPa", "wind_direction_700hPa", "wind_direction_600hPa"],
+
+            current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code"],
+            minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m", "visibility"],
+            wind_speed_unit: "ms",
+            forecast_minutely_15: 48,
+          };
+
+          const data = await fetchWeatherApi(url, params);
+
+          const utcOffsetSeconds = data[0].utcOffsetSeconds();
+
+          const hourly = data[0].hourly()!;
+          const current = data[0].current()!;
+          const minutely15 = data[0].minutely15()!;
+
+          const weatherData = {
+            current: {
+              time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
+              wind_gusts_10m: current.variables(0)!.value(),
+              wind_direction_10m: current.variables(1)!.value(),
+              wind_speed_10m: current.variables(2)!.value(),
+              cloud_cover: current.variables(3)!.value(),
+              weather_code: current.variables(4)!.value(),
+            },
+            hourly: {
+              time: Array.from(
+                { length: (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval() },
+                (_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
+              ),
+              temperature_2m: hourly.variables(0)!.valuesArray(),
+              wind_speed_1000hPa: hourly.variables(1)!.valuesArray(),
+              wind_speed_950hPa: hourly.variables(2)!.valuesArray(),
+              wind_speed_925hPa: hourly.variables(3)!.valuesArray(),
+              wind_speed_700hPa: hourly.variables(4)!.valuesArray(),
+              wind_speed_600hPa: hourly.variables(5)!.valuesArray(),
+              weather_code: hourly.variables(6)!.valuesArray(),
+              wind_speed_10m: hourly.variables(7)!.valuesArray(),
+              wind_speed_80m: hourly.variables(8)!.valuesArray(),
+              wind_speed_120m: hourly.variables(9)!.valuesArray(),
+              wind_speed_180m: hourly.variables(10)!.valuesArray(),
+              wind_direction_10m: hourly.variables(11)!.valuesArray(),
+              wind_direction_80m: hourly.variables(12)!.valuesArray(),
+              wind_direction_120m: hourly.variables(13)!.valuesArray(),
+              wind_direction_180m: hourly.variables(14)!.valuesArray(),
+              wind_gusts_10m: hourly.variables(15)!.valuesArray(),
+              cloud_cover_1000hPa: hourly.variables(16)!.valuesArray(),
+              cloud_cover_975hPa: hourly.variables(17)!.valuesArray(),
+              cloud_cover_950hPa: hourly.variables(18)!.valuesArray(),
+              cloud_cover_925hPa: hourly.variables(19)!.valuesArray(),
+              cloud_cover_900hPa: hourly.variables(20)!.valuesArray(),
+              cloud_cover_850hPa: hourly.variables(21)!.valuesArray(),
+              cloud_cover_800hPa: hourly.variables(22)!.valuesArray(),
+              cloud_cover_700hPa: hourly.variables(23)!.valuesArray(),
+              cloud_cover_600hPa: hourly.variables(24)!.valuesArray(),
+              wind_speed_975hPa: hourly.variables(25)!.valuesArray(),
+              wind_speed_900hPa: hourly.variables(26)!.valuesArray(),
+              wind_speed_800hPa: hourly.variables(27)!.valuesArray(),
+              wind_speed_850hPa: hourly.variables(28)!.valuesArray(),
+              wind_direction_800hPa: hourly.variables(29)!.valuesArray(),
+              wind_direction_850hPa: hourly.variables(30)!.valuesArray(),
+              wind_direction_900hPa: hourly.variables(31)!.valuesArray(),
+              wind_direction_925hPa: hourly.variables(32)!.valuesArray(),
+              wind_direction_950hPa: hourly.variables(33)!.valuesArray(),
+              wind_direction_975hPa: hourly.variables(34)!.valuesArray(),
+              wind_direction_1000hPa: hourly.variables(35)!.valuesArray(),
+              wind_direction_700hPa: hourly.variables(36)!.valuesArray(),
+              wind_direction_600hPa: hourly.variables(37)!.valuesArray(),
+
+            },
+            minutely_15: {
+              time: Array.from(
+                { length: (Number(minutely15.timeEnd()) - Number(minutely15.time())) / minutely15.interval() },
+                (_, i) => new Date((Number(minutely15.time()) + i * minutely15.interval() + utcOffsetSeconds) * 1000)
+              ),
+              wind_speed_10m: minutely15.variables(0)!.valuesArray(),
+              wind_speed_80m: minutely15.variables(1)!.valuesArray(),
+              wind_speed_120m: minutely15.variables(2)!.valuesArray(),
+              wind_direction_10m: minutely15.variables(3)!.valuesArray(),
+              wind_direction_80m: minutely15.variables(4)!.valuesArray(),
+              wind_gusts_10m: minutely15.variables(5)!.valuesArray(),
+              visibility: minutely15.variables(6)!.valuesArray(),
+            }
+          };
+
+          setCurrent(weatherData.current);
+          setHourly(weatherData.hourly);
+          setMinutely15(weatherData.minutely_15);
+
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+        }
+      };
 
         fetchData();
     }, []);
@@ -149,12 +191,25 @@ export default function WeatherScreen() {
         });
     };
 
-
+    //also take isNight into account for how safe it is and other stuff....
+    
     return (
         <ScrollView>
             <View style={styles.rootContainer}>
-                <Text style={styles.title}>Weathertest</Text>
-                <Text>Fetching weather data for latitude: {params.latitude}, longitude: {params.longitude}</Text>
+                <Text style={styles.title}>Dropzone: {LOCATION}</Text>
+                <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
+
+                <Text style={styles.lowerTitle}>Jumping is probably {current?.wind_gusts_10m && current?.cloud_cover ? ((current.wind_gusts_10m > 8 || current.cloud_cover > 75) ? "dangerous" : "safe") : "unsure"}</Text>
+
+                {current && (
+                    <View style={styles.container}>
+                        <Text>Time: {current.time?.toLocaleString()}</Text>
+                        <Text>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)}</Text>
+                        <Text>Cloud Cover: {current.cloud_cover}</Text>
+                        <Text style={styles.lowerTitle}>METAR:</Text>
+                        <Text>{metarData}</Text>
+                    </View>
+                )}
 
 
                 {minutely15 && (
@@ -201,20 +256,6 @@ export default function WeatherScreen() {
                             initialSpacing={0}
                         />
 
-                    </View>
-                )}
-
-
-
-                {current && (
-                    <View style={styles.container}>
-                        <Text style={styles.lowerTitle}>Current Weather:</Text>
-                        <Text>Time: {current.time?.toString()}</Text>
-                        <Text>Wind Gusts 10m: {current.wind_gusts_10m}</Text>
-                        <Text>Wind Direction 10m: {current.wind_direction_10m}</Text>
-                        <Text>Wind Speed 10m: {current.wind_speed_10m}</Text>
-                        <Text>Cloud Cover: {current.cloud_cover}</Text>
-                        <Text>Weather Code: {current.weather_code}</Text>
                     </View>
                 )}
 

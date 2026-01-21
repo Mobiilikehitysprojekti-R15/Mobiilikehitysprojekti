@@ -16,6 +16,11 @@ export default function WeatherScreen() {
 
     const LOCATION : string = "EFOU"; //Oulun lentoasema ICAO koodi
 
+    //tee parempi tapa määritellä turvallisuusrajat riippuen lisensseistä ja hyppytyypistä (tandem on 11/ms)
+    const maxWindGustLimitSTUDENT : number = 8; //m/s
+    const maxWindGustLimitLICENSE_B : number = 11; //m/s
+    const maxCloudCoverLimitSTUDENT : number = 75; //prosenttia
+
     const [current, setCurrent] = React.useState<currentWeather | null>(null);
     const [hourly, setHourly] = React.useState<hourlyWeather | null>(null);
     const [minutely15, setMinutely15] = React.useState<fifteenMinuteWeather | null>(null);
@@ -166,6 +171,7 @@ export default function WeatherScreen() {
     }, []);
 
 
+    //voi vähä tehä kuvaajista ei niin tarkkoja...
     const filterCloseValuesWithIndex = (
         values: number[],
         threshold: number
@@ -192,14 +198,15 @@ export default function WeatherScreen() {
     };
 
     //also take isNight into account for how safe it is and other stuff....
-    
+
     return (
         <ScrollView>
             <View style={styles.rootContainer}>
                 <Text style={styles.title}>Dropzone: {LOCATION}</Text>
                 <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
 
-                <Text style={styles.lowerTitle}>Jumping is probably {current?.wind_gusts_10m && current?.cloud_cover ? ((current.wind_gusts_10m > 8 || current.cloud_cover > 75) ? "dangerous" : "safe") : "unsure"}</Text>
+                <Text style={styles.lowerTitle}>Jumping is probably {current?.wind_gusts_10m && current?.cloud_cover ? 
+                ((current.wind_gusts_10m > maxWindGustLimitSTUDENT || current.cloud_cover > maxCloudCoverLimitSTUDENT) ? "dangerous" : "safe") : "unsure"}</Text>
 
                 {current && (
                     <View style={styles.container}>
@@ -223,8 +230,8 @@ export default function WeatherScreen() {
                             data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
                                 .map((item, newIndex) => ({ value: item.value,  label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
 
-                            data2={Array(24).fill({ value: 8})}
-                            data3={Array(24).fill({ value: 11})}
+                            data2={Array(24).fill({ value: maxCloudCoverLimitSTUDENT})}
+                            data3={Array(24).fill({ value: maxWindGustLimitLICENSE_B})}
                             color2='yellow'
                             color3='red'
 
@@ -266,8 +273,8 @@ export default function WeatherScreen() {
                         <LineChart
                             data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
                                 .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
-                            data2={Array(24).fill({ value: 8})}
-                            data3={Array(24).fill({ value: 11})}
+                            data2={Array(24).fill({ value: maxCloudCoverLimitSTUDENT})}
+                            data3={Array(24).fill({ value: maxWindGustLimitLICENSE_B})}
                             color2='yellow'
                             color3='red'
 
@@ -281,8 +288,6 @@ export default function WeatherScreen() {
                             startFillColor={'blue'}
                             hideDataPoints={true}
                             width={250}
-                            showReferenceLine1={true}
-                            referenceLine1Position={8}
                             
                             height={200}
                             adjustToWidth={true}

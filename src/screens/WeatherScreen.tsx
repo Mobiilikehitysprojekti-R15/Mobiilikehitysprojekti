@@ -197,6 +197,24 @@ export default function WeatherScreen() {
         });
     };
 
+
+    const isNight = (date: Date): boolean => {
+        const hours = date.getHours();
+        return hours < 6 || hours > 20;
+    }
+
+    const isJumpSafe = (): boolean | null => {
+
+      if(isNight(current!.time!)){
+        return false; //night time jumping not allowed for students
+      }
+
+        if (current?.wind_gusts_10m !== undefined && current?.cloud_cover !== undefined) {
+            return (current.wind_gusts_10m <= maxWindGustLimitSTUDENT && current.cloud_cover <= maxCloudCoverLimitSTUDENT);
+        }
+        return null; //unsure
+    }
+
     //also take isNight into account for how safe it is and other stuff....
 
     return (
@@ -205,8 +223,7 @@ export default function WeatherScreen() {
                 <Text style={styles.title}>Dropzone: {LOCATION}</Text>
                 <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
 
-                <Text style={styles.lowerTitle}>Jumping is probably {current?.wind_gusts_10m && current?.cloud_cover ? 
-                ((current.wind_gusts_10m > maxWindGustLimitSTUDENT || current.cloud_cover > maxCloudCoverLimitSTUDENT) ? "dangerous" : "safe") : "unsure"}</Text>
+                <Text style={styles.lowerTitle}>Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure"}</Text>
 
                 {current && (
                     <View style={styles.container}>

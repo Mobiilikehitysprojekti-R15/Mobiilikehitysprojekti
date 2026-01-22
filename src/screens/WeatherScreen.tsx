@@ -31,9 +31,7 @@ export default function WeatherScreen() {
 
     const [windSpeedType, setWindSpeedType] = React.useState<string>('KT'); //KT or MS
 
-    const knotsToMs = (knots: number): number => {
-      return knots * 0.514444;
-    }
+    
 
     useEffect(() => {
 
@@ -222,10 +220,37 @@ export default function WeatherScreen() {
       }
 
         if (current?.wind_gusts_10m !== undefined && current?.cloud_cover !== undefined) {
-            return (current.wind_gusts_10m <= maxWindGustLimitSTUDENT && current.cloud_cover <= maxCloudCoverLimitSTUDENT);
+            const windGusts = current.wind_gusts_10m!;
+            const cloudCover = current.cloud_cover!;
+
+            if(windSpeedType === 'KT'){
+              //convert to m/s for checking
+              const windGustsMs = windGusts * 0.514444;
+              if (windGustsMs <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
+                  return true; //safe
+              } else {
+                  return false; //dangerous
+              }
+            }else{
+              if (windGusts <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
+                  return true; //safe
+              } else {
+                  return false; //dangerous
+              }
+            }
         }
         return null; //unsure
     }
+
+    //convert from knots to m/s and vice versa
+    const knotsToMs = (knots: number): number => {
+      return knots * 0.514444;
+    }
+
+    const msToKnots = (ms: number): number => {
+      return ms / 0.514444;
+    }
+
 
     //also take isNight into account for how safe it is and other stuff....
 
@@ -276,8 +301,8 @@ export default function WeatherScreen() {
                             data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
                                 .map((item, newIndex) => ({ value: item.value,  label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
 
-                            data2={Array(24).fill({ value: maxCloudCoverLimitSTUDENT})}
-                            data3={Array(24).fill({ value: maxWindGustLimitLICENSE_B})}
+                            data2={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitSTUDENT) : maxWindGustLimitSTUDENT)})}
+                            data3={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitLICENSE_B) : maxWindGustLimitLICENSE_B) })}
 
                             color2='yellow'
                             color3='red'
@@ -320,8 +345,8 @@ export default function WeatherScreen() {
                         <LineChart
                             data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
                                 .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
-                            data2={Array(24).fill({ value: maxCloudCoverLimitSTUDENT})}
-                            data3={Array(24).fill({ value: maxWindGustLimitLICENSE_B})}
+                            data2={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitSTUDENT) : maxWindGustLimitSTUDENT)})}
+                            data3={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitLICENSE_B) : maxWindGustLimitLICENSE_B) })}
                             color2='yellow'
                             color3='red'
 

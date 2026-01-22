@@ -2,14 +2,16 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
+import { AuthProvider } from "./context/AuthContext";
 
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <BottomNavigation />
-      
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <BottomNavigation />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 

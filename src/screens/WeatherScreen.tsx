@@ -1,11 +1,9 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Button } from 'react-native'
 import React from 'react'
 import { fetchWeatherApi } from 'openmeteo';
 import { useEffect } from 'react';
 import { BarChart, LineChart, lineDataItem } from 'react-native-gifted-charts';
-import { currentWeather, hourlyWeather, fifteenMinuteWeather } from '../types/WeatherTypes';
-
-
+import { currentWeather, hourlyWeather, fifteenMinuteWeather, metarType } from '../types/WeatherTypes';
 
 
 
@@ -29,6 +27,14 @@ export default function WeatherScreen() {
     const [getLatitude, setLatitude] = React.useState<number>(64.9301);
     const [getLongitude, setLongitude] = React.useState<number>(25.3546);
 
+    const [metarObject, setMetarObject] = React.useState<metarType | null>(null);
+
+    const [windSpeedType, setWindSpeedType] = React.useState<string>('KT'); //KT or MS
+
+    const knotsToMs = (knots: number): number => {
+      return knots * 0.514444;
+    }
+
     useEffect(() => {
 
         const metarUrl = `https://aviationweather.gov/api/data/metar?ids=${LOCATION}&format=json`;
@@ -48,6 +54,8 @@ export default function WeatherScreen() {
 
                     setLatitude(data[0].lat);
                     setLongitude(data[0].lon);
+
+                    setMetarObject(data[0]);
                 }
 
             } catch (error) {
@@ -77,7 +85,7 @@ export default function WeatherScreen() {
 
             current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code"],
             minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m", "visibility"],
-            wind_speed_unit: "ms",
+            wind_speed_unit: (windSpeedType === 'KT') ? "kn" : "ms",
             forecast_minutely_15: 48,
           };
 
@@ -168,7 +176,7 @@ export default function WeatherScreen() {
       };
 
         fetchData();
-    }, []);
+    }, [windSpeedType, LOCATION]);
 
 
     //voi vähä tehä kuvaajista ei niin tarkkoja...
@@ -224,7 +232,18 @@ export default function WeatherScreen() {
     return (
         <ScrollView>
             <View style={styles.rootContainer}>
-                <Text style={styles.title}>Dropzone: {LOCATION}</Text>
+
+                <Button title={windSpeedType === 'KT' ? 'Change to m/s' : 'Change to KT'} onPress={() => {
+                    if (windSpeedType === 'KT') {
+                        //convert to m/s
+                        setWindSpeedType('MS');
+                    } else {
+                        //convert to KT
+                        setWindSpeedType('KT');
+                    }
+                }} />
+
+                <Text style={styles.title}>Dropzone: {metarObject?.name ?? LOCATION}</Text>
                 <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
 
                 <Text style={styles.lowerTitle}>Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure"}</Text>
@@ -232,10 +251,16 @@ export default function WeatherScreen() {
                 {current && (
                     <View style={styles.container}>
                         <Text>Time: {current.time?.toLocaleString()}</Text>
-                        <Text>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)}</Text>
-                        <Text>Cloud Cover: {current.cloud_cover}</Text>
+                        <Text>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)} {windSpeedType === 'KT' ? 'KT' : 'm/s'}</Text>
+                        <Text>Cloud Cover: {current.cloud_cover}%</Text>
+                        <Text>Wind direction 10m: {current.wind_direction_10m} °</Text>
                         <Text style={styles.lowerTitle}>METAR:</Text>
                         <Text>{metarData}</Text>
+                        <Text>Temperature: {metarObject?.temp} °C</Text>
+                        <Text>Wind Speed: {metarObject?.wspd} KT</Text>
+                        <Text>Wind Direction: {metarObject?.wdir} °</Text>
+                        <Text>Visibility: {metarObject?.visib ? metarObject?.visib : "unknown"} miles</Text>
+
                     </View>
                 )}
 
@@ -253,6 +278,7 @@ export default function WeatherScreen() {
 
                             data2={Array(24).fill({ value: maxCloudCoverLimitSTUDENT})}
                             data3={Array(24).fill({ value: maxWindGustLimitLICENSE_B})}
+
                             color2='yellow'
                             color3='red'
 
@@ -270,7 +296,7 @@ export default function WeatherScreen() {
                             areaChart1={true}
                             startFillColor={'blue'}
 
-                            yAxisLabelSuffix='m/s'
+                            yAxisLabelSuffix={windSpeedType === 'KT' ? 'KT' : 'm/s'}
                             noOfSections={5}
                             hideDataPoints={true}
                             xAxisLabelTextStyle={{ fontSize: 10 }}
@@ -312,7 +338,7 @@ export default function WeatherScreen() {
                             
                             height={200}
                             adjustToWidth={true}
-                            yAxisLabelSuffix='m/s'
+                            yAxisLabelSuffix={windSpeedType === 'KT' ? 'KT' : 'm/s'}
                             xAxisLabelTextStyle={{ fontSize: 10 }}
                             xAxisTextNumberOfLines={2}
                             allowFontScaling={true}

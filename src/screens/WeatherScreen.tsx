@@ -205,6 +205,10 @@ export default function WeatherScreen() {
 
     const isJumpSafe = (): boolean | null => {
 
+      if(current === null){
+        return null; //no data
+      }
+
       if(isNight(current!.time!)){
         return false; //night time jumping not allowed for students
       }

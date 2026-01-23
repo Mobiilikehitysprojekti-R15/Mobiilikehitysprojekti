@@ -29,7 +29,7 @@ export default function StatisticsTest() {
         />
 
         <Text>Statistics Test Screen</Text>
-        <Text>{selectedSlice ? `Selected: ${selectedSlice.text}` : 'No selection'}</Text>¨
+        <Text>{selectedSlice ? `Selected: ${selectedSlice.text}` : 'No selection'}</Text>
         <Text>{selectedSlice ? `Jumps: ${selectedSlice.value}` : ''}</Text>
     </View>
   )

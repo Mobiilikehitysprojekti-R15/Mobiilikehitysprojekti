@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, StyleSheet, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { PieChart } from 'react-native-gifted-charts'
+import { PieChart, BarChart } from 'react-native-gifted-charts'
 
 type JumpType = {
     number: number;
@@ -54,48 +54,70 @@ export default function StatisticsTest() {
         setAllFreefall(totalFreefall);
     },[])
 
-  return (
-    <View style= {style.cointainer}>
-        <PieChart
-            data={[
-                { value: jumpTypes.filter(j => j.jumpType === 'PL').length, text: 'PL', color: '#4CAF50' },
-                { value: jumpTypes.filter(j => j.jumpType === 'IA').length, text: 'IA', color: '#2196F3' },
-                { value: jumpTypes.filter(j => j.jumpType === 'IA > 2km').length, text: 'IA > 2km', color: '#FF9800' },
-            ]}
-            showText={true}
-            radius={100}
-            innerRadius={50}
-            textSize={14}
-            textColor={'black'}
-            fontStyle={'oblique'}
-            onPress={(item: Props, index:Number) => setSelectedSlice(item)}
-        />
+    return (
+        <View style={style.cointainer}>
 
-        <Text>Statistics Test Screen</Text>
-        <Text>{selectedSlice ? `Selected: ${selectedSlice.text}` : 'No selection'}</Text>
-        <Text>{selectedSlice ? `Jumps: ${selectedSlice.value}` : ''}</Text>
+            <ScrollView style={style.scrollContainer}>
+                <PieChart
+                    data={[
+                        { value: jumpTypes.filter(j => j.jumpType === 'PL').length, text: 'PL', color: '#7eccff' },
+                        { value: jumpTypes.filter(j => j.jumpType === 'IA').length, text: 'IA', color: '#ffa1ff' },
+                        { value: jumpTypes.filter(j => j.jumpType === 'IA > 2km').length, text: 'IA > 2km', color: '#d2ffad' },
+                    ]}
+                    showText={true}
+                    radius={100}
+                    innerRadius={50}
+                    textSize={14}
+                    textColor={'black'}
+                    fontStyle={'oblique'}
+                    onPress={(item: Props, index: Number) => setSelectedSlice(item)}
+                />
 
-        <Text>Total free fall time: {allFreeFall}s</Text>
 
-        
-        <ScrollView>
-            {
-                
-                jumpTypes.map((item, index) => (
-                    <View style={style.jumpSlot} key={index}>
-                        <Text>{item.jumpType}</Text>
-                        <Text>{item.date.getDate().toString() + "." + item.date.getMonth().toString() + "." + item.date.getFullYear().toString()}</Text>
-                        <Text>Altitude: {item.altitude}</Text>
-                        <Text> Free fall amount: {item.freefallTime}s</Text>
-                        <Button title={"See more"}/>
-                    </View>
-                ))
-            }
-            
-        </ScrollView>
+                <Text>Jumps during the season 2025</Text>
+                <BarChart
+                    data={[
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 1).length, label: 'Jan' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 2).length, label: 'Feb' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 3).length, label: 'Mar' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 4).length, label: 'Apr' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 5).length, label: 'May' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 6).length, label: 'Jun' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 7).length, label: 'Jul' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 8).length, label: 'Aug' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 9).length, label: 'Sep' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 10).length, label: 'Oct' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 11).length, label: 'Nov' },
+                        { value: jumpTypes.filter(j => j.date.getMonth() === 12).length, label: 'Dec' },
 
-    </View>
-  )
+                    ]}
+                    width={250}
+                    adjustToWidth={true}
+                    allowFontScaling={true}
+                />
+
+                <Text>Statistics Test Screen</Text>
+                <Text>{selectedSlice ? `Selected: ${selectedSlice.text}` : 'No selection'}</Text>
+                <Text>{selectedSlice ? `Jumps: ${selectedSlice.value}` : ''}</Text>
+
+                <Text>Total free fall time: {allFreeFall}s</Text>
+                {
+
+                    jumpTypes.map((item, index) => (
+                        <View style={style.jumpSlot} key={index}>
+                            <Text>{item.jumpType}</Text>
+                            <Text>{item.date.getDate().toString() + "." + item.date.getMonth().toString() + "." + item.date.getFullYear().toString()}</Text>
+                            <Text>Altitude: {item.altitude}m</Text>
+                            <Text> Free fall amount: {item.freefallTime}s</Text>
+                            <Button title={"See more"} />
+                        </View>
+                    ))
+                }
+
+            </ScrollView>
+
+        </View>
+    )
 }
 
 const style = StyleSheet.create({
@@ -103,6 +125,9 @@ const style = StyleSheet.create({
         marginHorizontal: 20,
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
+    },
+    scrollContainer:{
+        width:'100%'
     },
     jumpSlot:{
         margin: 20

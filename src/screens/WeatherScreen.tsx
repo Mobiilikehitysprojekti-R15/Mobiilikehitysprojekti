@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        marginTop: 70,
+        marginTop: 40,
     },
     container: {
         flex: 1,

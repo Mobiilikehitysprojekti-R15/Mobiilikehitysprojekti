@@ -103,7 +103,7 @@ export default function StatisticsTest() {
                 <Text>Total free fall time: {allFreeFall}s</Text>
                 {
 
-                    jumpTypes.map((item, index) => (
+                    jumpTypes.reverse().map((item, index) => (
                         <View style={style.jumpSlot} key={index}>
                             <Text>{item.jumpType}</Text>
                             <Text>{item.date.getDate().toString() + "." + item.date.getMonth().toString() + "." + item.date.getFullYear().toString()}</Text>

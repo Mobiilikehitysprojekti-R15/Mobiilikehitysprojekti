@@ -108,7 +108,8 @@ export default function StatisticsTest() {
                             <Text>{item.jumpType}</Text>
                             <Text>{item.date.getDate().toString() + "." + item.date.getMonth().toString() + "." + item.date.getFullYear().toString()}</Text>
                             <Text>Altitude: {item.altitude}m</Text>
-                            <Text> Free fall amount: {item.freefallTime}s</Text>
+                            <Text>Free fall amount: {item.freefallTime}s</Text>
+                            <Text>{item.approved ? "Approved" : "Not Approved"}</Text>
                             <Button title={"See more"} />
                         </View>
                     ))

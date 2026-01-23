@@ -4,6 +4,7 @@ import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./context/AuthContext";
 
+
 export default function App() {
   return (
     <AuthProvider>
@@ -13,6 +14,7 @@ export default function App() {
     </AuthProvider>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

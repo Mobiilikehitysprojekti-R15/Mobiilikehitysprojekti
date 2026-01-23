@@ -60,3 +60,27 @@ export type fifteenMinuteWeather = {
     wind_gusts_10m: Float32Array<ArrayBufferLike> | null | undefined,
     visibility: Float32Array<ArrayBufferLike> | null | undefined,
 }
+
+export type metarType = {
+  altim: number,      
+  clouds: string[],
+  cover: string,
+  dewP: string,
+  elev: number,
+  fltCat: string,
+  icaoId: string,
+  lat: number,
+  lon: number,
+  metarType: string,
+  name: string,
+  obsTime: string,
+  qcField: number,
+  rawOb: string,
+  receiptTime: string,
+  reportTime: string,
+  temp: number,
+  visib: number,
+  wdir: number,
+  wspd: number,
+  wxString: string,
+}

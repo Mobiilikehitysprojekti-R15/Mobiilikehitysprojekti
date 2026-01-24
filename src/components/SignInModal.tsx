@@ -3,18 +3,42 @@ import {
   Button,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { SignInModalProps } from "../types/signInModal";
 import React, { useState } from "react";
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+
+const LICENSE_TYPES = ["Student", "A", "B", "C", "D"] as const;
+type LicenseType = (typeof LICENSE_TYPES)[number];
+
+const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
+const MONTHS = [
+  { value: 0, label: "January" },
+  { value: 1, label: "February" },
+  { value: 2, label: "March" },
+  { value: 3, label: "April" },
+  { value: 4, label: "May" },
+  { value: 5, label: "June" },
+  { value: 6, label: "July" },
+  { value: 7, label: "August" },
+  { value: 8, label: "September" },
+  { value: 9, label: "October" },
+  { value: 10, label: "November" },
+  { value: 11, label: "December" },
+];
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
 const SignInModal = ({ visible, onClose }: SignInModalProps) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -24,11 +48,26 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [name, setName] = useState("");
+  const [licenseType, setLicenseType] = useState<LicenseType>("Student");
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [birthDay, setBirthDay] = useState<number | null>(null);
+  const [birthMonth, setBirthMonth] = useState<number | null>(null);
+  const [birthYear, setBirthYear] = useState<number | null>(null);
+
   const resetForm = () => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
     setError("");
+    setName("");
+    setLicenseType("Student");
+    setAddress("");
+    setPhoneNumber("");
+    setBirthDay(null);
+    setBirthMonth(null);
+    setBirthYear(null);
   };
 
   const handleToggleMode = () => {
@@ -42,6 +81,13 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
     onClose();
   };
 
+  const getDateOfBirth = (): Date | null => {
+    if (birthDay && birthMonth !== null && birthYear) {
+      return new Date(birthYear, birthMonth, birthDay);
+    }
+    return null;
+  };
+
   const handleSubmit = async () => {
     setError("");
 
@@ -50,9 +96,31 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
       return;
     }
 
-    if (isSignUp && password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+    if (isSignUp) {
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      if (!name.trim()) {
+        setError("Please enter your name");
+        return;
+      }
+
+      if (!address.trim()) {
+        setError("Please enter your address");
+        return;
+      }
+
+      if (!phoneNumber.trim()) {
+        setError("Please enter your phone number");
+        return;
+      }
+
+      if (birthDay === null || birthMonth === null || birthYear === null) {
+        setError("Please select your date of birth");
+        return;
+      }
     }
 
     if (password.length < 6) {
@@ -63,7 +131,22 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
     setLoading(true);
     try {
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+
+        const dateOfBirth = getDateOfBirth();
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          name: name.trim(),
+          email: email.toLowerCase(),
+          licenseType,
+          address: address.trim(),
+          phoneNumber: phoneNumber.trim(),
+          dateOfBirth: dateOfBirth?.toISOString(),
+          createdAt: new Date().toISOString(),
+        });
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
@@ -101,33 +184,157 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
             {isSignUp ? "Sign Up" : "Sign In"}
           </Text>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-            editable={!loading}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={true}
-            value={password}
-            onChangeText={setPassword}
-            editable={!loading}
-          />
-          {isSignUp && (
+
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
             <TextInput
               style={styles.input}
-              placeholder="Confirm Password"
-              secureTextEntry={true}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
               editable={!loading}
             />
-          )}
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              value={password}
+              onChangeText={setPassword}
+              editable={!loading}
+            />
+            {isSignUp && (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Confirm Password"
+                  secureTextEntry={true}
+                  autoCapitalize="none"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  editable={!loading}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Full Name"
+                  autoCapitalize="words"
+                  value={name}
+                  onChangeText={setName}
+                  editable={!loading}
+                />
+
+                <Text>License Type</Text>
+                <View style={styles.licenseContainer}>
+                  {LICENSE_TYPES.map((type) => (
+                    <Pressable
+                      key={type}
+                      style={[
+                        styles.licenseOption,
+                        licenseType === type && styles.licenseOptionSelected,
+                      ]}
+                      onPress={() => setLicenseType(type)}
+                      disabled={loading}
+                    >
+                      <Text
+                        style={[
+                          licenseType === type &&
+                            styles.licenseOptionTextSelected,
+                        ]}
+                      >
+                        {type}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Address"
+                  autoCapitalize="words"
+                  value={address}
+                  onChangeText={setAddress}
+                  editable={!loading}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Phone Number"
+                  keyboardType="phone-pad"
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  editable={!loading}
+                />
+
+                <Text>Date of Birth</Text>
+                <View style={styles.dobContainer}>
+                  <View style={styles.pickerWrapper}>
+                    <Picker<number | null>
+                      selectedValue={birthDay}
+                      onValueChange={(value: number | null) =>
+                        setBirthDay(value)
+                      }
+                      enabled={!loading}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Day" value={null} />
+                      {DAYS.map((day) => (
+                        <Picker.Item
+                          key={day}
+                          label={String(day)}
+                          value={day}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.pickerWrapper}>
+                    <Picker<number | null>
+                      selectedValue={birthMonth}
+                      onValueChange={(value: number | null) =>
+                        setBirthMonth(value)
+                      }
+                      enabled={!loading}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Month" value={null} />
+                      {MONTHS.map((month) => (
+                        <Picker.Item
+                          key={month.value}
+                          label={month.label}
+                          value={month.value}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.pickerWrapper}>
+                    <Picker<number | null>
+                      selectedValue={birthYear}
+                      onValueChange={(value: number | null) =>
+                        setBirthYear(value)
+                      }
+                      enabled={!loading}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Year" value={null} />
+                      {YEARS.map((year) => (
+                        <Picker.Item
+                          key={year}
+                          label={String(year)}
+                          value={year}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+              </>
+            )}
+          </ScrollView>
+
           {loading ? (
             <ActivityIndicator size="small" color="#007AFF" />
           ) : (
@@ -138,7 +345,9 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
           )}
           <View style={styles.toggleRow}>
             <Text style={styles.toggleText}>
-              {isSignUp ? "Already have an account? " : "Don't have an account? "}
+              {isSignUp
+                ? "Already have an account? "
+                : "Don't have an account? "}
             </Text>
             <Pressable onPress={handleToggleMode} disabled={loading}>
               <Text style={styles.toggleLink}>
@@ -168,11 +377,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     gap: 10,
-    width: "80%",
+    width: 300,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  scrollView: {
+    width: "100%",
+    maxHeight: 400,
+  },
+  scrollViewContent: {
+    gap: 10,
+    paddingBottom: 10,
   },
   input: {
     width: "100%",
@@ -180,6 +397,40 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
+  },
+  licenseContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    width: "100%",
+  },
+  licenseOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    backgroundColor: "#fff",
+  },
+  licenseOptionSelected: {
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
+  },
+  licenseOptionTextSelected: {
+    color: "#fff",
+  },
+  dobContainer: {
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+  },
+  picker: {
+    height: 50,
   },
   errorText: {
     color: "red",

@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, Button } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { BarChart, LineChart, lineDataItem } from 'react-native-gifted-charts';
 
 import useWeather from '../hooks/useWeather';
+import StyledButton from '../components/StyledButton';
 
 
 export default function WeatherScreen() {
@@ -110,7 +111,7 @@ export default function WeatherScreen() {
         <ScrollView>
             <View style={styles.rootContainer}>
 
-                <Button title={windSpeedType === 'KT' ? 'Change to m/s' : 'Change to KT'} onPress={() => {
+                <StyledButton title={windSpeedType === 'KT' ? 'Change to m/s' : 'Change to KT'} onPress={() => {
                     if (windSpeedType === 'KT') {
                         //convert to m/s
                         setWindSpeedType('MS');

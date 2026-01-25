@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import StyledButton from "../components/StyledButton";
 import ProfileAuth from "../components/ProfileAuth";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../config/firebase";
@@ -66,7 +67,7 @@ const ProfileScreen = (props: Props) => {
       ) : (
         <Text>Profile information not available</Text>
       )}
-      <Button onPress={signOut} title="Sign Out" />
+      <StyledButton onPress={signOut} title="Sign Out" />
     </View>
   );
 };

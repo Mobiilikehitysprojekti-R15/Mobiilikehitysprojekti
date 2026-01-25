@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import SignInModal from "./SignInModal";
+import StyledButton from "./StyledButton";
 
 type Props = {
   text?: string;
@@ -13,7 +14,7 @@ const ProfileAuth = ({
   return (
     <View style={styles.container}>
       <Text>{text}</Text>
-      <Button title="Sign In" onPress={() => setModalVisible(true)} />
+      <StyledButton title="Sign In" onPress={() => setModalVisible(true)} />
 
       <SignInModal
         visible={modalVisible}

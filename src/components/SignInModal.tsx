@@ -1,12 +1,9 @@
 import {
-  ActivityIndicator,
-  Button,
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -18,6 +15,8 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import StyledTextInput from "./StyledTextInput";
+import StyledButton from "./StyledButton";
 
 const LICENSE_TYPES = ["Student", "A", "B", "C", "D"] as const;
 type LicenseType = (typeof LICENSE_TYPES)[number];
@@ -190,18 +189,18 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
             contentContainerStyle={styles.scrollViewContent}
             showsVerticalScrollIndicator={false}
           >
-            <TextInput
+            <StyledTextInput
+              label="Email"
               style={styles.input}
-              placeholder="Email"
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
               onChangeText={setEmail}
               editable={!loading}
             />
-            <TextInput
+            <StyledTextInput
+              label="Password"
               style={styles.input}
-              placeholder="Password"
               secureTextEntry={true}
               autoCapitalize="none"
               value={password}
@@ -210,66 +209,56 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
             />
             {isSignUp && (
               <>
-                <TextInput
+                <StyledTextInput
+                  label="Confirm Password"
                   style={styles.input}
-                  placeholder="Confirm Password"
                   secureTextEntry={true}
                   autoCapitalize="none"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   editable={!loading}
                 />
-                <TextInput
+                <StyledTextInput
+                  label="Full Name"
                   style={styles.input}
-                  placeholder="Full Name"
                   autoCapitalize="words"
                   value={name}
                   onChangeText={setName}
                   editable={!loading}
                 />
 
-                <Text>License Type</Text>
+                <Text style={styles.sectionLabel}>License Type</Text>
                 <View style={styles.licenseContainer}>
                   {LICENSE_TYPES.map((type) => (
-                    <Pressable
+                    <StyledButton
                       key={type}
-                      style={[
-                        styles.licenseOption,
-                        licenseType === type && styles.licenseOptionSelected,
-                      ]}
+                      title={type}
+                      variant={licenseType === type ? "filled" : "outline"}
                       onPress={() => setLicenseType(type)}
                       disabled={loading}
-                    >
-                      <Text
-                        style={[
-                          licenseType === type &&
-                            styles.licenseOptionTextSelected,
-                        ]}
-                      >
-                        {type}
-                      </Text>
-                    </Pressable>
+                      style={styles.licenseButton}
+                    />
                   ))}
                 </View>
 
-                <TextInput
+                <StyledTextInput
+                  label="Address"
                   style={styles.input}
-                  placeholder="Address"
                   autoCapitalize="words"
                   value={address}
                   onChangeText={setAddress}
                   editable={!loading}
                 />
-                <TextInput
+                <StyledTextInput
+                  label="Phone Number"
                   style={styles.input}
-                  placeholder="Phone Number"
                   keyboardType="phone-pad"
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   editable={!loading}
                 />
 
-                <Text>Date of Birth</Text>
+                <Text style={styles.sectionLabel}>Date of Birth</Text>
                 <View style={styles.dobContainer}>
                   <View style={styles.pickerWrapper}>
                     <Picker<number | null>
@@ -335,14 +324,12 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
             )}
           </ScrollView>
 
-          {loading ? (
-            <ActivityIndicator size="small" color="#007AFF" />
-          ) : (
-            <Button
-              title={isSignUp ? "Sign Up" : "Sign In"}
-              onPress={handleSubmit}
-            />
-          )}
+          <StyledButton
+            title={isSignUp ? "Sign Up" : "Sign In"}
+            onPress={handleSubmit}
+            loading={loading}
+            style={styles.submitButton}
+          />
           <View style={styles.toggleRow}>
             <Text style={styles.toggleText}>
               {isSignUp
@@ -355,7 +342,12 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
               </Text>
             </Pressable>
           </View>
-          <Button title="Close" onPress={handleClose} disabled={loading} />
+          <StyledButton
+            title="Close"
+            onPress={handleClose}
+            disabled={loading}
+            style={styles.closeButton}
+          />
         </View>
       </View>
     </Modal>
@@ -377,7 +369,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     gap: 10,
-    width: 300,
+    width: "90%",
   },
   modalTitle: {
     fontSize: 18,
@@ -390,6 +382,11 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     gap: 10,
     paddingBottom: 10,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 10,
   },
   input: {
     width: "100%",
@@ -404,20 +401,8 @@ const styles = StyleSheet.create({
     gap: 8,
     width: "100%",
   },
-  licenseOption: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
-  licenseOptionSelected: {
-    backgroundColor: "#007AFF",
-    borderColor: "#007AFF",
-  },
-  licenseOptionTextSelected: {
-    color: "#fff",
+  licenseButton: {
+    marginTop: 0,
   },
   dobContainer: {
     flexDirection: "column",
@@ -447,5 +432,13 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontWeight: "500",
     fontSize: 15,
+  },
+  submitButton: {
+    width: "100%",
+    marginTop: 10,
+  },
+  closeButton: {
+    width: "100%",
+    marginTop: 0,
   },
 });

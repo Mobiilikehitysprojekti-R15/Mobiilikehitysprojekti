@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { Text } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import NewScreen from "../screens/NewScreen";
 import ProfileScreen from "../screens/ProfileScreen";
@@ -14,7 +15,9 @@ const BottomNavigation = () => {
       screenOptions={{
         tabBarActiveTintColor: "#1E1E1E",
         tabBarInactiveTintColor: "#A9A9A9",
-        // maybe some more font styles here but im too lazy
+        headerTitleStyle: {
+          fontFamily: "Inter_700Bold",
+        },
       }}
       // change this if feels bad to use, history/fullHistory maybe
       backBehavior="firstRoute"
@@ -26,6 +29,17 @@ const BottomNavigation = () => {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color,
+                fontSize: 10,
+              }}
+            >
+              Home
+            </Text>
+          ),
         }}
       />
       <Tab.Screen
@@ -34,6 +48,17 @@ const BottomNavigation = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Feather name="wind" size={size} color={color} />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color,
+                fontSize: 10,
+              }}
+            >
+              Weather
+            </Text>
           ),
         }}
       />
@@ -44,14 +69,36 @@ const BottomNavigation = () => {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add" size={size} color={color} />
           ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color,
+                fontSize: 10,
+              }}
+            >
+              New
+            </Text>
+          ),
         }}
       />
       <Tab.Screen
-        name="Stats"
+        name="Logbook"
         component={StatsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="pulse" size={size} color={color} />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color,
+                fontSize: 10,
+              }}
+            >
+              Stats
+            </Text>
           ),
         }}
       />
@@ -61,6 +108,17 @@ const BottomNavigation = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color,
+                fontSize: 10,
+              }}
+            >
+              Profile
+            </Text>
           ),
         }}
       />

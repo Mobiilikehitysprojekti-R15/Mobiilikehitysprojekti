@@ -33,7 +33,7 @@ const initialFormData: JumpFormData = {
   plane: "",
   altitude: "",
   canopy: "",
-  releaseType: "PL",
+  releaseType: "Static line",
   isAccepted: false,
   freefallTime: "",
   notes: "",
@@ -122,10 +122,7 @@ const NewScreen = (props: Props) => {
     return <ProfileAuth text="Please sign in to add new jump" />;
   }
 
-  const onDateChange = (
-    event: DateTimePickerEvent,
-    selectedDate?: Date,
-  ) => {
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
     if (selectedDate) {
       updateField("jumpDate", selectedDate);
@@ -199,34 +196,37 @@ const NewScreen = (props: Props) => {
           <Text
             style={[
               styles.switchLabel,
-              formData.releaseType === "PL" && styles.switchLabelActive,
+              formData.releaseType === "Static line" &&
+                styles.switchLabelActive,
             ]}
           >
-            PL
+            Static line
           </Text>
           <TouchableOpacity
             style={styles.switch}
             onPress={() =>
               updateField(
                 "releaseType",
-                formData.releaseType === "PL" ? "IA" : "PL",
+                formData.releaseType === "Static line"
+                  ? "Free fall"
+                  : "Static line",
               )
             }
           >
             <View
               style={[
                 styles.switchThumb,
-                formData.releaseType === "IA" && styles.switchThumbRight,
+                formData.releaseType === "Free fall" && styles.switchThumbRight,
               ]}
             />
           </TouchableOpacity>
           <Text
             style={[
               styles.switchLabel,
-              formData.releaseType === "IA" && styles.switchLabelActive,
+              formData.releaseType === "Free fall" && styles.switchLabelActive,
             ]}
           >
-            IA
+            Free fall
           </Text>
         </View>
 

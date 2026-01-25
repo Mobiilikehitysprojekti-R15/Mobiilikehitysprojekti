@@ -5,7 +5,7 @@ export type JumpFormData = {
   plane: string;
   altitude: string;
   canopy: string;
-  releaseType: "PL" | "IA";
+  releaseType: "Static line" | "Free fall";
   isAccepted: boolean;
   freefallTime: string;
   notes: string;

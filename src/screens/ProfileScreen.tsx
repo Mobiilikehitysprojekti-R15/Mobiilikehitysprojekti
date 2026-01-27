@@ -56,17 +56,32 @@ const ProfileScreen = (props: Props) => {
         <Text>Loading profile...</Text>
       ) : profile ? (
         <>
-          <Text>Name: {profile.name}</Text>
-          <Text>Email: {profile.email}</Text>
-          <Text>License Type: {profile.licenseType}</Text>
+          {/*NAME AND EMAIL centered*/}
+          <View style={styles.nameCard}>
+            <Text style={styles.bold}>{profile.name || "Your name"}</Text>
+            <Text>{profile.email || "Your email"}</Text>
+          </View>
+
+          {/*LICENSE*/}
+          <View style={styles.licenseCard}>
+            <Text style={styles.bold}>License</Text>
+            <Text>{profile?.licenseType || "Student/A/B/C/D"}</Text>
+          </View>
+
+          {/*PERSONAL INFO*/}
+          <Text style={styles.bold}>Personal info</Text>
           <Text>Phone Number: {profile.phoneNumber}</Text>
           <Text>Address: {profile.address}</Text>
           <Text>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
           <Text>Member Since: {formatDate(profile.createdAt)}</Text>
+
+          {/*CHANGE INFO button, ei tapahu vielä mitään tästä*/}
+          <StyledButton title="Change Info" onPress={() => {}} />
         </>
       ) : (
         <Text>Profile information not available</Text>
       )}
+      {/*<Text style={styles.bold}>Stats</Text>*/}
       <StyledButton onPress={signOut} title="Sign Out" />
     </View>
   );
@@ -78,10 +93,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
   },
-  welcomeText: {
+  bold: {
+    fontSize: 22,
+    fontWeight: "600",
+  },
+  nameCard: {
+    fontSize: 24,
+    fontWeight: "600",
+    alignItems: "center"
+  },
+  licenseCard: {
+    fontSize: 24,
+    fontWeight: "600",
+    paddingVertical: 10,
+  },
+    welcomeText: {
     fontSize: 18,
     marginBottom: 20,
   },

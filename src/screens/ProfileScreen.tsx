@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import StyledButton from "../components/StyledButton";
 import ProfileAuth from "../components/ProfileAuth";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { UserProfile } from "../types/auth";
+import * as ImagePicker from "expo-image-picker";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { updateDoc } from "firebase/firestore";
 
 type Props = {};
 
@@ -56,33 +59,48 @@ const ProfileScreen = (props: Props) => {
         <Text>Loading profile...</Text>
       ) : profile ? (
         <>
-          {/*NAME AND EMAIL centered*/}
+          {/*PICTURE, NAME AND EMAIL centered, ei voi vielä asettaa profiilikuvaa*/}
           <View style={styles.nameCard}>
-            <Text style={styles.bold}>{profile.name || "Your name"}</Text>
-            <Text>{profile.email || "Your email"}</Text>
+            <Image source={require("../assets/avatar-placeholder.png")}style={styles.avatar}/>
+            <View style={styles.nameText}>
+              <Text style={styles.bold}>{profile.name || "Your name"}</Text>
+              <Text>{profile.email || "Your email"}</Text>
+            </View>
           </View>
 
           {/*LICENSE*/}
-          <View style={styles.licenseCard}>
+          <View style={styles.headingCard}>
             <Text style={styles.bold}>License</Text>
             <Text>{profile?.licenseType || "Student/A/B/C/D"}</Text>
           </View>
 
           {/*PERSONAL INFO*/}
-          <Text style={styles.bold}>Personal info</Text>
-          <Text>Phone Number: {profile.phoneNumber}</Text>
-          <Text>Address: {profile.address}</Text>
-          <Text>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
-          <Text>Member Since: {formatDate(profile.createdAt)}</Text>
+          <View style={styles.headingCard}>
+            <Text style={styles.bold}>Personal info</Text>
+            <Text>Phone Number: {profile.phoneNumber}</Text>
+            <Text>Address: {profile.address}</Text>
+            <Text>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
+            <Text>Member Since: {formatDate(profile.createdAt)}</Text>
 
-          {/*CHANGE INFO button, ei tapahu vielä mitään tästä*/}
-          <StyledButton title="Change Info" onPress={() => {}} />
+            {/*CHANGE INFO button, ei tapahu vielä mitään tästä*/}
+            <StyledButton title="Change Info" onPress={() => {}} />
+          </View>
+
+          <View style={styles.headingCard}>
+            <Text style={styles.bold}>Stats</Text>
+            <Text>Tähän vois laittaa montako hyppyä tehny tms pientä tietoa</Text>
+            {/*STATS button, ei tapahu vielä mitään tästä*/}
+            <StyledButton title="View Stats" onPress={() => {}} />
+          </View>
+      
+
+          <View style={{ marginTop: "auto" }}>
+            <StyledButton title="Sign out" onPress={signOut} />
+          </View>
         </>
       ) : (
         <Text>Profile information not available</Text>
       )}
-      {/*<Text style={styles.bold}>Stats</Text>*/}
-      <StyledButton onPress={signOut} title="Sign Out" />
     </View>
   );
 };
@@ -98,18 +116,29 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
   },
-  nameCard: {
-    fontSize: 24,
-    fontWeight: "600",
-    alignItems: "center"
-  },
-  licenseCard: {
+  headingCard: {
     fontSize: 24,
     fontWeight: "600",
     paddingVertical: 10,
+    paddingTop: 20,
   },
     welcomeText: {
     fontSize: 18,
     marginBottom: 20,
+  },
+    avatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 12,
+  },
+    nameCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+    nameText: {
+    alignItems: "flex-start",
   },
 });

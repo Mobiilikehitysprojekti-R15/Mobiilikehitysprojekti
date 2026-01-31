@@ -34,7 +34,7 @@ export const DROPZONES = [
     { code: "EFRO", name: "Rovaniemi Airport" },
     //{ code: "EFJM", name: "Jämijärvi Airfield" },
     { code: "EFHK", name: "Helsinki-Vantaa Airport" },
-    //{ code: "EFSE", name: "Seinäjoki Airport" },
+    { code: "EFSI", name: "Seinäjoki Airport" },
 ] as const;
 
 export type DropzoneCode = (typeof DROPZONES)[number]["code"];

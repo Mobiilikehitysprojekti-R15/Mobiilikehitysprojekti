@@ -1,15 +1,18 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { BarChart, LineChart, lineDataItem } from 'react-native-gifted-charts';
 
 import useWeather from '../hooks/useWeather';
 import StyledButton from '../components/StyledButton';
+import DropzoneModal from '../components/DropzoneModal';
+import { useDropzone } from '../context/DropzoneContext';
 
 
 export default function WeatherScreen() {
+    const { dropzone } = useDropzone();
 
 
-    const LOCATION : string = "EFOU"; //Oulun lentoasema ICAO koodi
+    const LOCATION : string = dropzone || "EFOU"; //Oulun lentoasema ICAO koodi
 
     //tee parempi tapa määritellä turvallisuusrajat riippuen lisensseistä ja hyppytyypistä (tandem on 11/ms)
     const maxWindGustLimitSTUDENT : number = 8; //m/s
@@ -17,6 +20,7 @@ export default function WeatherScreen() {
     const maxCloudCoverLimitSTUDENT : number = 75; //prosenttia
 
     const [windSpeedType, setWindSpeedType] = React.useState<'KT' | 'MS'>('KT'); //KT or MS
+    const [dropzoneModalVisible, setDropzoneModalVisible] = useState(false);
 
 
     const {
@@ -65,31 +69,31 @@ export default function WeatherScreen() {
     const isJumpSafe = (): boolean | null => {
 
       if(current === null){
-        return null; //no data
-      }
+            return null; //no data
+        }
 
       if(isNight(current!.time!)){
-        return false; //night time jumping not allowed for students
-      }
+            return false; //night time jumping not allowed for students
+        }
 
         if (current?.wind_gusts_10m !== undefined && current?.cloud_cover !== undefined) {
             const windGusts = current.wind_gusts_10m!;
             const cloudCover = current.cloud_cover!;
 
             if(windSpeedType === 'KT'){
-              //convert to m/s for checking
-              const windGustsMs = windGusts * 0.514444;
-              if (windGustsMs <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
-                  return true; //safe
-              } else {
-                  return false; //dangerous
-              }
+                //convert to m/s for checking
+                const windGustsMs = windGusts * 0.514444;
+                if (windGustsMs <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
+                    return true; //safe
+                } else {
+                    return false; //dangerous
+                }
             }else{
-              if (windGusts <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
-                  return true; //safe
-              } else {
-                  return false; //dangerous
-              }
+                if (windGusts <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
+                    return true; //safe
+                } else {
+                    return false; //dangerous
+                }
             }
         }
         return null; //unsure
@@ -97,11 +101,11 @@ export default function WeatherScreen() {
 
     //convert from knots to m/s and vice versa
     const knotsToMs = (knots: number): number => {
-      return knots * 0.514444;
+        return knots * 0.514444;
     }
 
     const msToKnots = (ms: number): number => {
-      return ms / 0.514444;
+        return ms / 0.514444;
     }
 
 
@@ -111,15 +115,31 @@ export default function WeatherScreen() {
         <ScrollView>
             <View style={styles.rootContainer}>
 
-                <StyledButton title={windSpeedType === 'KT' ? 'Change to m/s' : 'Change to KT'} onPress={() => {
-                    if (windSpeedType === 'KT') {
-                        //convert to m/s
-                        setWindSpeedType('MS');
-                    } else {
-                        //convert to KT
-                        setWindSpeedType('KT');
-                    }
-                }} />
+                <View style={styles.buttonRow}>
+                    <StyledButton
+                        title={windSpeedType === 'KT' ? 'Change to m/s' : 'Change to KT'}
+                        onPress={() => {
+                            if (windSpeedType === 'KT') {
+                                //convert to m/s
+                                setWindSpeedType('MS');
+                            } else {
+                                //convert to KT
+                                setWindSpeedType('KT');
+                            }
+                        }}
+                        style={styles.rowButton}
+                    />
+                    <StyledButton
+                        title="Change dropzone"
+                        onPress={() => setDropzoneModalVisible(true)}
+                        style={styles.rowButton}
+                    />
+                </View>
+
+                <DropzoneModal
+                    visible={dropzoneModalVisible}
+                    onClose={() => setDropzoneModalVisible(false)}
+                />
 
                 <Text style={styles.title}>Dropzone: {metarObject?.name ?? LOCATION}</Text>
                 <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
@@ -169,7 +189,7 @@ export default function WeatherScreen() {
                             height={200}
                             adjustToWidth={true}
                             width={250}
-                            
+
 
                             areaChart1={true}
                             startFillColor={'blue'}
@@ -213,7 +233,7 @@ export default function WeatherScreen() {
                             startFillColor={'blue'}
                             hideDataPoints={true}
                             width={250}
-                            
+
                             height={200}
                             adjustToWidth={true}
                             yAxisLabelSuffix={windSpeedType === 'KT' ? 'KT' : 'm/s'}
@@ -259,5 +279,14 @@ const styles = StyleSheet.create({
     },
     explanationText:{
         marginBottom: 10,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        gap: 10,
+        marginBottom: 10,
+    },
+    rowButton: {
+        flex: 1,
+        marginTop: 0,
     }
 })

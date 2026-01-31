@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./context/AuthContext";
+import { DropzoneProvider } from "./context/DropzoneContext";
 import {
   useFonts,
   Inter_100Thin,
@@ -39,9 +40,11 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <BottomNavigation />
-      </NavigationContainer>
+      <DropzoneProvider>
+        <NavigationContainer>
+          <BottomNavigation />
+        </NavigationContainer>
+      </DropzoneProvider>
     </AuthProvider>
   );
 }

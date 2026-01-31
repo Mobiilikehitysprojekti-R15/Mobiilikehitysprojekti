@@ -1,5 +1,6 @@
 import { StyleSheet, ScrollView, View } from "react-native";
 import YourDropzone from "../components/YourDropzone";
+import WindStats from "../components/WindStats";
 
 type Props = {};
 
@@ -8,6 +9,7 @@ const HomeScreen = (props: Props) => {
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
         <YourDropzone />
+        <WindStats />
       </View>
     </ScrollView>
   );

@@ -4,6 +4,7 @@
 
 # dependencies
 src/node_modules/
+node_modules/
 
 # Expo
 .expo/

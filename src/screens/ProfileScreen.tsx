@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import StyledButton from "../components/StyledButton";
 import ProfileAuth from "../components/ProfileAuth";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { db } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { UserProfile } from "../types/auth";
@@ -11,6 +12,7 @@ type Props = {};
 
 const ProfileScreen = (props: Props) => {
   const { user, loading, signOut } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
@@ -47,25 +49,25 @@ const ProfileScreen = (props: Props) => {
     return date.toLocaleDateString();
   };
 
-  if (loading) return <Text>Loading...</Text>;
+  if (loading) return <Text style={{ color: theme.colors.text }}>Loading...</Text>;
   if (!user) return <ProfileAuth />;
 
   return (
-    <View style={styles.container}>
+    <View style={{ backgroundColor: theme.colors.surface }}>
       {profileLoading ? (
-        <Text>Loading profile...</Text>
+        <Text style={{ color: theme.colors.textSecondary }}>Loading profile...</Text>
       ) : profile ? (
         <>
-          <Text>Name: {profile.name}</Text>
-          <Text>Email: {profile.email}</Text>
-          <Text>License Type: {profile.licenseType}</Text>
-          <Text>Phone Number: {profile.phoneNumber}</Text>
-          <Text>Address: {profile.address}</Text>
-          <Text>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
-          <Text>Member Since: {formatDate(profile.createdAt)}</Text>
+          <Text style={{ color: theme.colors.text }}>Name: {profile.name}</Text>
+          <Text style={{ color: theme.colors.text }}>Email: {profile.email}</Text>
+          <Text style={{ color: theme.colors.text }}>License Type: {profile.licenseType}</Text>
+          <Text style={{ color: theme.colors.text }}>Phone Number: {profile.phoneNumber}</Text>
+          <Text style={{ color: theme.colors.text }}>Address: {profile.address}</Text>
+          <Text style={{ color: theme.colors.text }}>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
+          <Text style={{ color: theme.colors.text }}>Member Since: {formatDate(profile.createdAt)}</Text>
         </>
       ) : (
-        <Text>Profile information not available</Text>
+        <Text style={{ color: theme.colors.textSecondary }}>Profile information not available</Text>
       )}
       <StyledButton onPress={signOut} title="Sign Out" />
     </View>

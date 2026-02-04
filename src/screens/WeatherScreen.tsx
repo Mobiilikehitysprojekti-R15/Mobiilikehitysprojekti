@@ -6,10 +6,12 @@ import useWeather from '../hooks/useWeather';
 import StyledButton from '../components/StyledButton';
 import DropzoneModal from '../components/DropzoneModal';
 import { useDropzone } from '../context/DropzoneContext';
+import { useTheme } from '../context/ThemeContext';
 
 
 export default function WeatherScreen() {
     const { dropzone } = useDropzone();
+    const { theme } = useTheme();
 
 
     const LOCATION : string = dropzone || "EFOU"; //Oulun lentoasema ICAO koodi
@@ -112,7 +114,7 @@ export default function WeatherScreen() {
     //also take isNight into account for how safe it is and other stuff....
 
     return (
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: theme.colors.background }}>
             <View style={styles.rootContainer}>
 
                 <View style={styles.buttonRow}>
@@ -141,23 +143,25 @@ export default function WeatherScreen() {
                     onClose={() => setDropzoneModalVisible(false)}
                 />
 
-                <Text style={styles.title}>Dropzone: {metarObject?.name ?? LOCATION}</Text>
-                <Text>Wind and weather data for {getLatitude}, {getLongitude}</Text>
+                <Text style={[styles.title, { color: theme.colors.text }]}>Dropzone: {metarObject?.name ?? LOCATION}</Text>
+                <Text style={{ color: theme.colors.textSecondary }}>Wind and weather data for {getLatitude}, {getLongitude}</Text>
 
-                <Text style={styles.lowerTitle}>Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure"}</Text>
+                <Text style={[styles.lowerTitle, { color: isJumpSafe() ? theme.colors.success : theme.colors.error }]}>
+                    Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure"}
+                </Text>
 
                 {current && (
-                    <View style={styles.container}>
-                        <Text>Time: {current.time?.toLocaleString()}</Text>
-                        <Text>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)} {windSpeedType === 'KT' ? 'KT' : 'm/s'}</Text>
-                        <Text>Cloud Cover: {current.cloud_cover}%</Text>
-                        <Text>Wind direction 10m: {current.wind_direction_10m} °</Text>
-                        <Text style={styles.lowerTitle}>METAR:</Text>
-                        <Text>{metarData}</Text>
-                        <Text>Temperature: {metarObject?.temp} °C</Text>
-                        <Text>Wind Speed: {metarObject?.wspd} KT</Text>
-                        <Text>Wind Direction: {metarObject?.wdir} °</Text>
-                        <Text>Visibility: {metarObject?.visib ? metarObject?.visib : "unknown"} miles</Text>
+                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+                        <Text style={{ color: theme.colors.text }}>Time: {current.time?.toLocaleString()}</Text>
+                        <Text style={{ color: theme.colors.text }}>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)} {windSpeedType === 'KT' ? 'KT' : 'm/s'}</Text>
+                        <Text style={{ color: theme.colors.text }}>Cloud Cover: {current.cloud_cover}%</Text>
+                        <Text style={{ color: theme.colors.text }}>Wind direction 10m: {current.wind_direction_10m} °</Text>
+                        <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>METAR:</Text>
+                        <Text style={{ color: theme.colors.textSecondary }}>{metarData}</Text>
+                        <Text style={{ color: theme.colors.text }}>Temperature: {metarObject?.temp} °C</Text>
+                        <Text style={{ color: theme.colors.text }}>Wind Speed: {metarObject?.wspd} KT</Text>
+                        <Text style={{ color: theme.colors.text }}>Wind Direction: {metarObject?.wdir} °</Text>
+                        <Text style={{ color: theme.colors.text }}>Visibility: {metarObject?.visib ? metarObject?.visib : "unknown"} miles</Text>
 
                     </View>
                 )}
@@ -165,10 +169,10 @@ export default function WeatherScreen() {
 
                 {minutely15 && (
 
-                    <View style={styles.container}>
+                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
 
-                        <Text style={styles.lowerTitle}>Wind gust forecast:</Text>
-                        <Text style={styles.explanationText}>Wind Gusts (next 8 hours):</Text>
+                        <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>Wind gust forecast:</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind Gusts (next 8 hours):</Text>
 
                         <LineChart
                             data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
@@ -197,14 +201,14 @@ export default function WeatherScreen() {
                             yAxisLabelSuffix={windSpeedType === 'KT' ? 'KT' : 'm/s'}
                             noOfSections={5}
                             hideDataPoints={true}
-                            xAxisLabelTextStyle={{ fontSize: 10 }}
+                            xAxisLabelTextStyle={{ fontSize: 10, color: theme.colors.textSecondary }}
                             allowFontScaling={true}
                             yAxisLabelWidth={70}
                             hideRules={false}
                             hideAxesAndRules={false}
-                            yAxisColor={'black'}
-                            xAxisColor={'black'}
-                            yAxisTextStyle={{ color: 'black' }}
+                            yAxisColor={theme.colors.border}
+                            xAxisColor={theme.colors.border}
+                            yAxisTextStyle={{ color: theme.colors.textSecondary }}
                             initialSpacing={0}
                         />
 
@@ -212,9 +216,9 @@ export default function WeatherScreen() {
                 )}
 
                 {hourly && (
-                    <View style={styles.container}>
-                        <Text style={styles.lowerTitle}>Hourly Weather:</Text>
-                        <Text style={styles.explanationText}>Wind gusts 10m (previus 24 hours):</Text>
+                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+                        <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>Hourly Weather:</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind gusts 10m (previus 24 hours):</Text>
                         <LineChart
                             data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
                                 .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
@@ -237,16 +241,16 @@ export default function WeatherScreen() {
                             height={200}
                             adjustToWidth={true}
                             yAxisLabelSuffix={windSpeedType === 'KT' ? 'KT' : 'm/s'}
-                            xAxisLabelTextStyle={{ fontSize: 10 }}
+                            xAxisLabelTextStyle={{ fontSize: 10, color: theme.colors.textSecondary }}
                             xAxisTextNumberOfLines={2}
                             allowFontScaling={true}
                             yAxisLabelWidth={70}
                             noOfSections={4}
                             hideRules={false}
                             hideAxesAndRules={false}
-                            yAxisColor={'black'}
-                            xAxisColor={'black'}
-                            yAxisTextStyle={{ color: 'black' }}
+                            yAxisColor={theme.colors.border}
+                            xAxisColor={theme.colors.border}
+                            yAxisTextStyle={{ color: theme.colors.textSecondary }}
                             initialSpacing={0}
                         />
                     </View>
@@ -272,13 +276,16 @@ const styles = StyleSheet.create({
     title:{
         fontSize: 20,
         fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
     },
     lowerTitle:{
         fontSize: 16,
         fontWeight: 'bold',
+        fontFamily: 'Inter_600SemiBold',
     },
     explanationText:{
         marginBottom: 10,
+        fontFamily: 'Inter_400Regular',
     },
     buttonRow: {
         flexDirection: 'row',
@@ -290,3 +297,4 @@ const styles = StyleSheet.create({
         marginTop: 0,
     }
 })
+

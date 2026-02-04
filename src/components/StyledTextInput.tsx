@@ -7,6 +7,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 interface StyledTextInputProps extends TextInputProps {
   label?: string;
@@ -22,15 +23,17 @@ const StyledTextInput = ({
   placeholder,
   ...props
 }: StyledTextInputProps) => {
+  const { theme } = useTheme();
   const resolvedPlaceholder =
     placeholder ?? (label ? `Enter ${label.toLowerCase()}` : undefined);
 
   return (
     <View style={containerStyle}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: theme.colors.text }]}>{label}</Text>}
       <TextInput
-        style={[styles.input, inputStyle, style]}
+        style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.colors.background, color: theme.colors.text }, inputStyle, style]}
         placeholder={resolvedPlaceholder}
+        placeholderTextColor={theme.colors.textSecondary}
         {...props}
       />
     </View>

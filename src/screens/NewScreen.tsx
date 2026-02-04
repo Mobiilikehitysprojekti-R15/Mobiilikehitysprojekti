@@ -29,7 +29,7 @@ import { JumpFormData } from "../types/jumpFormData";
 const initialFormData: JumpFormData = {
   jumpNumber: "",
   jumpDate: new Date(),
-  place: "",
+  dropzone: "",
   plane: "",
   altitude: "",
   canopy: "",
@@ -82,8 +82,8 @@ const NewScreen = (props: Props) => {
   const handleSubmit = async () => {
     if (!user) return;
 
-    if (!formData.place.trim()) {
-      Alert.alert("Error", "Please enter a place");
+    if (!formData.dropzone.trim()) {
+      Alert.alert("Error", "Please enter a dropzone ICAO code");
       return;
     }
 
@@ -139,12 +139,25 @@ const NewScreen = (props: Props) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <StyledTextInput
-        label="Jump Number"
-        onChangeText={(value) => updateField("jumpNumber", value)}
-        value={formData.jumpNumber}
-        keyboardType="numeric"
-      />
+      <View style={styles.inputRow}>
+        <View style={styles.inputRowItem}>
+          <StyledTextInput
+            label="Jump Number"
+            onChangeText={(value) => updateField("jumpNumber", value)}
+            value={formData.jumpNumber}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.inputRowItemSmall}>
+          <StyledTextInput
+            label="Dropzone"
+            onChangeText={(value) => updateField("dropzone", value.toUpperCase())}
+            value={formData.dropzone}
+            maxLength={4}
+            autoCapitalize="characters"
+          />
+        </View>
+      </View>
 
       <View style={styles.dateContainer}>
         <Text style={styles.dateLabel}>Jump Date</Text>
@@ -165,12 +178,6 @@ const NewScreen = (props: Props) => {
           />
         )}
       </View>
-
-      <StyledTextInput
-        label="Place"
-        onChangeText={(value) => updateField("place", value)}
-        value={formData.place}
-      />
 
       <StyledTextInput
         label="Plane"
@@ -197,7 +204,7 @@ const NewScreen = (props: Props) => {
             style={[
               styles.switchLabel,
               formData.releaseType === "Static line" &&
-                styles.switchLabelActive,
+              styles.switchLabelActive,
             ]}
           >
             Static line
@@ -276,6 +283,16 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
+  },
+  inputRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  inputRowItem: {
+    flex: 1,
+  },
+  inputRowItemSmall: {
+    flex: 1,
   },
   notesInput: {
     minHeight: 80,

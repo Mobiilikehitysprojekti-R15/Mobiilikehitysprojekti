@@ -1,7 +1,7 @@
 export type JumpFormData = {
   jumpNumber: string;
   jumpDate: Date;
-  place: string;
+  dropzone: string;
   plane: string;
   altitude: string;
   canopy: string;

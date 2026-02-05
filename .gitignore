@@ -8,6 +8,7 @@ src/node_modules/
 node_modules/
 
 # Expo
+src/.expo/
 .expo/
 dist/
 web-build/

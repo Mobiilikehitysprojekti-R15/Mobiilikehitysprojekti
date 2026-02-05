@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, ScrollView } from "react-native";
 import StyledButton from "../components/StyledButton";
 import ProfileAuth from "../components/ProfileAuth";
 import { useAuth } from "../context/AuthContext";
@@ -56,7 +56,7 @@ const ProfileScreen = (props: Props) => {
   if (!user) return <ProfileAuth />;
 
   return (
-    <View style={{ backgroundColor: theme.colors.surface }}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.surface }]}>
       {profileLoading ? (
         <Text style={{ color: theme.colors.textSecondary }}>Loading profile...</Text>
       ) : profile ? (
@@ -65,45 +65,60 @@ const ProfileScreen = (props: Props) => {
           <View style={styles.nameCard}>
             <Image source={require("../assets/avatar-placeholder.png")}style={styles.avatar}/>
             <View style={styles.nameText}>
-              <Text style={styles.bold}>{profile.name || "Your name"}</Text>
-              <Text>{profile.email || "Your email"}</Text>
+              <Text style={[styles.bold, { color: theme.colors.text }]}>{profile.name || "Your name"}</Text>
+              <Text style={{ color: theme.colors.text }}>{profile.email || "Your email"}</Text>
             </View>
           </View>
 
           {/*LICENSE*/}
           <View style={styles.headingCard}>
-            <Text style={styles.bold}>License</Text>
-            <Text>{profile?.licenseType || "Student/A/B/C/D"}</Text>
+            <Text style={[styles.bold, { color: theme.colors.text }]}>License</Text>
+            <Text style={{ color: theme.colors.text }}>{profile?.licenseType || "Student/A/B/C/D"}</Text>
           </View>
 
           {/*PERSONAL INFO*/}
           <View style={styles.headingCard}>
-            <Text style={styles.bold}>Personal info</Text>
-            <Text>Phone Number: {profile.phoneNumber}</Text>
-            <Text>Address: {profile.address}</Text>
-            <Text>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
-            <Text>Member Since: {formatDate(profile.createdAt)}</Text>
+            <Text style={[styles.bold, { color: theme.colors.text }]}>Personal info</Text>
+            <Text style={{ color: theme.colors.text }}>Phone Number: {profile.phoneNumber}</Text>
+            <Text style={{ color: theme.colors.text }}>Address: {profile.address}</Text>
+            <Text style={{ color: theme.colors.text }}>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
+            <Text style={{ color: theme.colors.text }}>Member Since: {formatDate(profile.createdAt)}</Text>
 
             {/*CHANGE INFO button, ei tapahu vielä mitään tästä*/}
             <StyledButton title="Change Info" onPress={() => {}} />
           </View>
 
           <View style={styles.headingCard}>
-            <Text style={styles.bold}>Stats</Text>
-            <Text>Tähän vois laittaa montako hyppyä tehny tms pientä tietoa</Text>
+            <Text style={[styles.bold, { color: theme.colors.text }]}>Stats</Text>
+            <Text style={{ color: theme.colors.text }}>Tähän vois laittaa montako hyppyä tehny tms pientä tietoa</Text>
             {/*STATS button, ei tapahu vielä mitään tästä*/}
             <StyledButton title="View Stats" onPress={() => {}} />
           </View>
-      
 
-          <View style={{ marginTop: "auto" }}>
+          {/*THEME TOGGLE*/}
+          <View style={styles.headingCard}>
+            <Text style={[styles.bold, { color: theme.colors.text }]}>Theme</Text>
+            <View style={styles.themeRow}>
+              <Text style={{ color: theme.colors.text }}>
+                {isDark ? "Dark Mode" : "Light Mode"}
+              </Text>
+              <Switch
+                value={isDark}
+                onValueChange={toggleTheme}
+                trackColor={{ false: "#E0E0E0", true: "#666666" }}
+                thumbColor={isDark ? "#FFFFFF" : "#1E1E1E"}
+              />
+            </View>
+          </View>
+
+          <View style={{ marginBottom: 60 }}>
             <StyledButton title="Sign out" onPress={signOut} />
           </View>
         </>
       ) : (
         <Text style={{ color: theme.colors.textSecondary }}>Profile information not available</Text>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -142,5 +157,10 @@ const styles = StyleSheet.create({
   },
     nameText: {
     alignItems: "flex-start",
+  },
+  themeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });

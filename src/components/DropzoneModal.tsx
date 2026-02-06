@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Modal,
   Pressable,
@@ -8,21 +8,66 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { DropzoneModalProps, DROPZONES } from "../types/dropzone";
+import { DropzoneModalProps, DROPZONES, dropzoneType } from "../types/dropzone";
 import { useDropzone } from "../context/DropzoneContext";
+import {db} from "../config/firebase";
+import { addDoc, collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 
 const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
   const { dropzone, setDropzone } = useDropzone();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredDropzones = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
+  const [dropZones, setDropZones] = useState<dropzoneType[] | null>(null)
+
+  useEffect(() => {
+    /*const query = searchQuery.toLowerCase().trim();
     if (!query) return DROPZONES;
     return DROPZONES.filter(
       (dz) =>
         dz.code.toLowerCase().includes(query) ||
         dz.name.toLowerCase().includes(query),
-    );
+    );*/
+
+    const getZones = async () => {
+      try {
+        const dropzonesRef = collection(db, "dropzones")
+        const q = query(dropzonesRef)
+        const querySnapshot = await getDocs(q)
+
+        if (!querySnapshot.empty) {
+
+          const dropzonesCurrent: dropzoneType[] = []
+
+          querySnapshot.docs.map((dz) => {
+            const current = {
+              ICAO: dz.data().ICAO,
+              name: dz.data().name,
+              country: dz.data().country
+            }
+            dropzonesCurrent.push(current)
+          })
+
+          if (searchQuery !== "") {
+
+            dropzonesCurrent.filter(dz =>
+              dz.name.toLowerCase().includes(searchQuery) ||
+              dz.ICAO.toLowerCase().includes(searchQuery) ||
+              dz.country.toLowerCase().includes(searchQuery)
+            )
+          }
+
+
+          setDropZones(dropzonesCurrent)
+
+        }
+      }
+      catch {
+        console.log("dropzones cant be found")
+      }
+    }
+
+    getZones()
+
   }, [searchQuery]);
 
   const handleSelect = (code: string) => {
@@ -37,8 +82,8 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
   };
 
   const getCurrentDropzoneName = () => {
-    const current = DROPZONES.find((dz) => dz.code === dropzone);
-    return current ? `${current.code} - ${current.name}` : dropzone;
+    const current = dropZones?.find((dz) => dz.ICAO === dropzone);
+    return current ? `${current.ICAO} - ${current.name}` : dropzone;
   };
 
   return (
@@ -61,34 +106,34 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
             style={styles.dropzoneList}
             showsVerticalScrollIndicator={true}
           >
-            {filteredDropzones.map((dz) => (
+            {dropZones?.map((dz) => (
               <Pressable
-                key={dz.code}
+                key={dz.ICAO}
                 style={[
                   styles.dropzoneItem,
-                  dropzone === dz.code && styles.dropzoneItemSelected,
+                  dropzone === dz.ICAO && styles.dropzoneItemSelected,
                 ]}
-                onPress={() => handleSelect(dz.code)}
+                onPress={() => handleSelect(dz.ICAO)}
               >
                 <Text
                   style={[
                     styles.dropzoneCode,
-                    dropzone === dz.code && styles.dropzoneTextSelected,
+                    dropzone === dz.ICAO && styles.dropzoneTextSelected,
                   ]}
                 >
-                  {dz.code}
+                  {dz.ICAO}
                 </Text>
                 <Text
                   style={[
                     styles.dropzoneName,
-                    dropzone === dz.code && styles.dropzoneTextSelected,
+                    dropzone === dz.ICAO && styles.dropzoneTextSelected,
                   ]}
                 >
                   {dz.name}
                 </Text>
               </Pressable>
             ))}
-            {filteredDropzones.length === 0 && (
+            {dropZones?.length === 0 && (
               <Text style={styles.noResults}>No dropzones found</Text>
             )}
           </ScrollView>

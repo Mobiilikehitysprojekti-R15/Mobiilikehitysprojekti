@@ -7,15 +7,28 @@ import { db } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { UserProfile } from "../types/auth";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateDoc } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+type RootStackParamList = {
+  Tabs: undefined;
+  Stats: undefined;
+};
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Tabs">;
 type Props = {};
 
 const ProfileScreen = (props: Props) => {
   const { user, loading, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
+
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
+
+  const storage = getStorage();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -53,15 +66,65 @@ const ProfileScreen = (props: Props) => {
   if (loading) return <Text>Loading...</Text>;
   if (!user) return <ProfileAuth />;
 
+  const pickAndSaveProfileImage = async () => {
+  try {
+    const permission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      alert("Permission required");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+    allowsEditing: true,
+    quality: 1,
+  });
+
+    if (result.canceled || !user) return;
+
+    const image = result.assets[0];
+
+    // Resize 128x128 + JPEG + base64
+    const manipulated = await ImageManipulator.manipulateAsync(
+      image.uri,
+      [{ resize: { width: 128, height: 128 } }],
+      {
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true,
+      }
+    );
+
+    if (!manipulated.base64) return;
+
+    await updateDoc(doc(db, "users", user.uid), {
+      profileImageBase64: manipulated.base64,
+    });
+
+    setProfile((prev) =>
+      prev
+        ? { ...prev, profileImageBase64: manipulated.base64 }
+        : prev
+    );
+  } catch (err) {
+    console.error("Profile image error:", err);
+  }
+};
+
   return (
     <View style={styles.container}>
-      {profileLoading ? (
-        <Text>Loading profile...</Text>
-      ) : profile ? (
+      {profileLoading ? (<Text>Loading profile...</Text>) : profile ? (
         <>
-          {/*PICTURE, NAME AND EMAIL centered, ei voi vielä asettaa profiilikuvaa*/}
+          {/*PICTURE, NAME AND EMAIL centered*/}
           <View style={styles.nameCard}>
-            <Image source={require("../assets/avatar-placeholder.png")}style={styles.avatar}/>
+            <TouchableOpacity onPress={pickAndSaveProfileImage}>
+              <Image style={styles.avatar} source={profile.profileImageBase64
+              ? {uri: `data:image/jpeg;base64,${profile.profileImageBase64}`,}
+              : require("../assets/avatar-placeholder.png")}
+            />
+            </TouchableOpacity>
+
             <View style={styles.nameText}>
               <Text style={styles.bold}>{profile.name || "Your name"}</Text>
               <Text>{profile.email || "Your email"}</Text>
@@ -88,9 +151,9 @@ const ProfileScreen = (props: Props) => {
 
           <View style={styles.headingCard}>
             <Text style={styles.bold}>Stats</Text>
-            <Text>Tähän vois laittaa montako hyppyä tehny tms pientä tietoa</Text>
+            <Text>You have logged x amount of jumps</Text>
             {/*STATS button, ei tapahu vielä mitään tästä*/}
-            <StyledButton title="View Stats" onPress={() => {}} />
+            <StyledButton title="View Stats" onPress={() => navigation.getParent()?.navigate("Stats")} />
           </View>
       
 

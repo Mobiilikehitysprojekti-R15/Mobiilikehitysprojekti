@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import RootNavigator from "./components/RootNavigator";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
@@ -42,7 +43,7 @@ export default function App() {
     <AuthProvider>
       <DropzoneProvider>
         <NavigationContainer>
-          <BottomNavigation />
+          <RootNavigator/>
         </NavigationContainer>
       </DropzoneProvider>
     </AuthProvider>

@@ -5,7 +5,7 @@ type Props = {};
 const StatsScreen = (props: Props) => {
   return (
     <View>
-      <Text>This is stats StatsScreen</Text>
+      <Text>This is StatsScreen</Text>
       <StatisticsTest />
     </View>
   );

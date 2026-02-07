@@ -4,7 +4,7 @@ import { Text } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import NewScreen from "../screens/NewScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import StatsScreen from "../screens/StatsScreen";
+import LogbookScreen from "../screens/LogbookScreen";
 import WeatherScreen from "../screens/WeatherScreen";
 import { useTheme } from "../context/ThemeContext";
 
@@ -95,7 +95,7 @@ const BottomNavigation = () => {
       />
       <Tab.Screen
         name="Logbook"
-        component={StatsScreen}
+        component={LogbookScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="pulse" size={size} color={color} />
@@ -110,7 +110,7 @@ const BottomNavigation = () => {
                 fontSize: 10,
               }}
             >
-              Stats
+              Logbook
             </Text>
           ),
         }}

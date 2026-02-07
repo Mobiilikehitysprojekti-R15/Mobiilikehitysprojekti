@@ -1,12 +1,15 @@
 import { StyleSheet, ScrollView, View } from "react-native";
 import YourDropzone from "../components/YourDropzone";
 import WindStats from "../components/WindStats";
+import { useTheme } from "../context/ThemeContext";
 
 type Props = {};
 
 const HomeScreen = (props: Props) => {
+  const { theme } = useTheme();
+
   return (
-    <ScrollView style={styles.scrollView}>
+    <ScrollView style={[styles.scrollView, { backgroundColor: theme.colors.background }]}>
       <View style={styles.container}>
         <YourDropzone />
         <WindStats />

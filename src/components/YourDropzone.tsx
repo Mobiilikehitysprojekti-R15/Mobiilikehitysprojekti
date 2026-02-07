@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useDropzone } from "../context/DropzoneContext";
+import { useTheme } from "../context/ThemeContext";
 import { DROPZONES } from "../types/dropzone";
 import DropzoneModal from "./DropzoneModal";
 
 const YourDropzone = () => {
   const { dropzone, loading } = useDropzone();
+  const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   const getDropzoneName = () => {
@@ -15,24 +17,24 @@ const YourDropzone = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.header}>Your dropzone</Text>
-        <Text style={styles.dropzoneText}>Loading...</Text>
+      <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.header, { color: theme.colors.text }]}>Your dropzone</Text>
+        <Text style={[styles.dropzoneText, { color: theme.colors.textSecondary }]}>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Your dropzone</Text>
-      <Text style={styles.dropzoneText}>
+    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+      <Text style={[styles.header, { color: theme.colors.text }]}>Your dropzone</Text>
+      <Text style={[styles.dropzoneText, { color: theme.colors.text }]}>
         {dropzone} - {getDropzoneName()}
       </Text>
       <Pressable
-        style={styles.changeButton}
+        style={[styles.changeButton, { backgroundColor: theme.colors.primary }]}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.changeButtonText}>Change</Text>
+        <Text style={[styles.changeButtonText, { color: theme.colors.background }]}>Change</Text>
       </Pressable>
 
       <DropzoneModal
@@ -47,7 +49,6 @@ export default YourDropzone;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#f8f8f8",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -60,19 +61,17 @@ const styles = StyleSheet.create({
   dropzoneText: {
     fontSize: 16,
     fontFamily: "Inter_400Regular",
-    color: "#333",
     marginBottom: 12,
   },
   changeButton: {
-    backgroundColor: "#000",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignSelf: "flex-start",
   },
   changeButtonText: {
-    color: "#fff",
     fontSize: 14,
     fontFamily: "Inter_500Medium",
   },
 });
+

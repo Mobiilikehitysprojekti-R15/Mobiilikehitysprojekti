@@ -17,6 +17,7 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import StyledTextInput from "./StyledTextInput";
 import StyledButton from "./StyledButton";
+import { useTheme } from "../context/ThemeContext";
 
 const LICENSE_TYPES = ["Student", "A", "B", "C", "D"] as const;
 type LicenseType = (typeof LICENSE_TYPES)[number];
@@ -40,6 +41,7 @@ const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
 const SignInModal = ({ visible, onClose }: SignInModalProps) => {
+  const { theme } = useTheme();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -178,11 +180,11 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
   return (
     <Modal visible={visible} transparent={true} onRequestClose={handleClose}>
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
             {isSignUp ? "Sign Up" : "Sign In"}
           </Text>
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error ? <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text> : null}
 
           <ScrollView
             style={styles.scrollView}
@@ -227,7 +229,7 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
                   editable={!loading}
                 />
 
-                <Text style={styles.sectionLabel}>License Type</Text>
+                <Text style={[styles.sectionLabel, { color: theme.colors.text }]}>License Type</Text>
                 <View style={styles.licenseContainer}>
                   {LICENSE_TYPES.map((type) => (
                     <StyledButton
@@ -258,18 +260,18 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
                   editable={!loading}
                 />
 
-                <Text style={styles.sectionLabel}>Date of Birth</Text>
+                <Text style={[styles.sectionLabel, { color: theme.colors.text }]}>Date of Birth</Text>
                 <View style={styles.dobContainer}>
-                  <View style={styles.pickerWrapper}>
+                  <View style={[styles.pickerWrapper, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
                     <Picker<number | null>
                       selectedValue={birthDay}
                       onValueChange={(value: number | null) =>
                         setBirthDay(value)
                       }
                       enabled={!loading}
-                      style={styles.picker}
+                      style={[styles.picker, { color: theme.colors.text }]}
                     >
-                      <Picker.Item label="Day" value={null} />
+                      <Picker.Item label="Day" value={null} color={theme.colors.textSecondary} />
                       {DAYS.map((day) => (
                         <Picker.Item
                           key={day}
@@ -280,16 +282,16 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
                     </Picker>
                   </View>
 
-                  <View style={styles.pickerWrapper}>
+                  <View style={[styles.pickerWrapper, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
                     <Picker<number | null>
                       selectedValue={birthMonth}
                       onValueChange={(value: number | null) =>
                         setBirthMonth(value)
                       }
                       enabled={!loading}
-                      style={styles.picker}
+                      style={[styles.picker, { color: theme.colors.text }]}
                     >
-                      <Picker.Item label="Month" value={null} />
+                      <Picker.Item label="Month" value={null} color={theme.colors.textSecondary} />
                       {MONTHS.map((month) => (
                         <Picker.Item
                           key={month.value}
@@ -300,16 +302,16 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
                     </Picker>
                   </View>
 
-                  <View style={styles.pickerWrapper}>
+                  <View style={[styles.pickerWrapper, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
                     <Picker<number | null>
                       selectedValue={birthYear}
                       onValueChange={(value: number | null) =>
                         setBirthYear(value)
                       }
                       enabled={!loading}
-                      style={styles.picker}
+                      style={[styles.picker, { color: theme.colors.text }]}
                     >
-                      <Picker.Item label="Year" value={null} />
+                      <Picker.Item label="Year" value={null} color={theme.colors.textSecondary} />
                       {YEARS.map((year) => (
                         <Picker.Item
                           key={year}
@@ -331,13 +333,13 @@ const SignInModal = ({ visible, onClose }: SignInModalProps) => {
             style={styles.submitButton}
           />
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleText}>
+            <Text style={[styles.toggleText, { color: theme.colors.textSecondary }]}>
               {isSignUp
                 ? "Already have an account? "
                 : "Don't have an account? "}
             </Text>
             <Pressable onPress={handleToggleMode} disabled={loading}>
-              <Text style={styles.toggleLink}>
+              <Text style={[styles.toggleLink, { color: theme.colors.primary }]}>
                 {isSignUp ? "Sign In" : "Sign Up"}
               </Text>
             </Pressable>
@@ -364,7 +366,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Inter_700Bold",
   },
   scrollView: {
     width: "100%",
@@ -385,13 +386,12 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Inter_600SemiBold",
     marginTop: 10,
   },
   input: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
   },
@@ -411,15 +411,14 @@ const styles = StyleSheet.create({
   },
   pickerWrapper: {
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 5,
   },
   picker: {
     height: 50,
   },
   errorText: {
-    color: "red",
     fontSize: 14,
+    fontFamily: "Inter_400Regular",
   },
   toggleRow: {
     flexDirection: "row",
@@ -427,10 +426,10 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 15,
+    fontFamily: "Inter_400Regular",
   },
   toggleLink: {
-    color: "#007AFF",
-    fontWeight: "500",
+    fontFamily: "Inter_500Medium",
     fontSize: 15,
   },
   submitButton: {

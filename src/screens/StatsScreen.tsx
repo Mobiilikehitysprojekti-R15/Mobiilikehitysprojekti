@@ -98,7 +98,7 @@ const StatsScreen = () => {
         Total freefall time this season: {totalFreefallTime} seconds
       </Text>
       {activeFiltersText && (
-        <Text style={[styles.filterText, { color: theme.colors.primary }]}>
+        <Text style={[styles.subheader, { color: theme.colors.textSecondary }]}>
           {activeFiltersText}
         </Text>
       )}

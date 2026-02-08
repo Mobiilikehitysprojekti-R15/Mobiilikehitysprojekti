@@ -2,25 +2,24 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { db } from "../config/firebase";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { JumpData } from "../types/jumpDataFirebase";
 
-interface LatestJump {
-    jumpNumber: number;
-    jumpDate: string;
-    dropzone: string;
-    altitude: number | null;
-    releaseType: "Static line" | "Free fall";
-    isAccepted: boolean;
-}
+type RootStackParamList = {
+    JumpInfo: { jump: JumpData };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const LatestSkydive = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
     const { user } = useAuth();
     const { theme } = useTheme();
-    const [latestJump, setLatestJump] = useState<LatestJump | null>(null);
+    const [latestJump, setLatestJump] = useState<JumpData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -40,10 +39,15 @@ const LatestSkydive = () => {
                     setLatestJump({
                         jumpNumber: doc.jumpNumber,
                         jumpDate: doc.jumpDate,
-                        dropzone: doc.dropzone || "N/A",
-                        altitude: doc.altitude,
+                        dropzone: doc.dropzone || "",
+                        plane: doc.plane || "",
+                        altitude: doc.altitude ?? null,
+                        canopy: doc.canopy || "",
                         releaseType: doc.releaseType || "Static line",
                         isAccepted: doc.isAccepted ?? false,
+                        freefallTime: doc.freefallTime ?? null,
+                        notes: doc.notes || "",
+                        createdAt: doc.createdAt || "",
                     });
                 }
             } catch (error) {
@@ -56,9 +60,11 @@ const LatestSkydive = () => {
         fetchLatestJump();
     }, [user]);
 
-    const handleLogbook = () => {
-        navigation.navigate("Logbook" as never);
-    };
+    const handleGoToJumpInfo = () => {
+    if (latestJump) {
+      navigation.navigate("JumpInfo", { jump: latestJump });
+    }
+  };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -141,9 +147,9 @@ const LatestSkydive = () => {
 
             <Pressable
                 style={[styles.logbookButton, { backgroundColor: theme.colors.primary }]}
-                onPress={handleLogbook}
+                onPress={handleGoToJumpInfo}
             >
-                <Text style={[styles.logbookButtonText, { color: theme.colors.background }]}>Logbook</Text>
+                <Text style={[styles.logbookButtonText, { color: theme.colors.background }]}>Go to jump info</Text>
             </Pressable>
         </View>
     );

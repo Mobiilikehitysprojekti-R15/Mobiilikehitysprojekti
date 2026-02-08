@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomNavigation from "./BottomNavigation";
 import StatsScreen from "../screens/StatsScreen";
+import JumpInfoScreen from "../screens/JumpInfoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,13 @@ const RootNavigator = () => {
         name="Stats"
         component={StatsScreen}
         options={{ title: "Stats" }}
+      />
+
+      {/* JUMP INFO SCREEN */}
+      <Stack.Screen
+        name="JumpInfo"
+        component={JumpInfoScreen}
+        options={{ title: "Jump Details" }}
       />
     </Stack.Navigator>
   );

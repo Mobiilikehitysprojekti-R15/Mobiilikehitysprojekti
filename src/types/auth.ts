@@ -4,6 +4,8 @@ import { ReactNode } from "react";
 export type LicenseType = "Student" | "A" | "B" | "C" | "D";
 
 export interface UserProfile {
+  photoURL: string;
+  profileImageBase64?: string;
   name: string;
   email: string;
   licenseType: LicenseType;

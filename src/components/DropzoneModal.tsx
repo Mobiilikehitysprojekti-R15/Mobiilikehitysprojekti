@@ -10,11 +10,13 @@ import {
 } from "react-native";
 import { DropzoneModalProps, DROPZONES, dropzoneType } from "../types/dropzone";
 import { useDropzone } from "../context/DropzoneContext";
+import { useTheme } from "../context/ThemeContext";
 import {db} from "../config/firebase";
 import { addDoc, collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 
 const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
   const { dropzone, setDropzone } = useDropzone();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
 
   const [dropZones, setDropZones] = useState<dropzoneType[] | null>(null)
@@ -89,13 +91,21 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
   return (
     <Modal visible={visible} transparent={true} onRequestClose={handleClose}>
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Change dropzone</Text>
-          <Text style={styles.currentDropzone}>{getCurrentDropzoneName()}</Text>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Change dropzone</Text>
+          <Text style={[styles.currentDropzone, { color: theme.colors.textSecondary }]}>{getCurrentDropzoneName()}</Text>
 
           <TextInput
-            style={styles.searchInput}
+            style={[
+              styles.searchInput,
+              {
+                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.background,
+                color: theme.colors.text,
+              }
+            ]}
             placeholder="Search dropzones..."
+            placeholderTextColor={theme.colors.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -111,14 +121,16 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
                 key={dz.ICAO}
                 style={[
                   styles.dropzoneItem,
-                  dropzone === dz.ICAO && styles.dropzoneItemSelected,
+                  { backgroundColor: theme.colors.surface },
+                  dropzone === dz.ICAO && { backgroundColor: theme.colors.primary },
                 ]}
                 onPress={() => handleSelect(dz.ICAO)}
               >
                 <Text
                   style={[
                     styles.dropzoneCode,
-                    dropzone === dz.ICAO && styles.dropzoneTextSelected,
+                    { color: theme.colors.text },
+                    dropzone === dz.ICAO && { color: theme.colors.background },
                   ]}
                 >
                   {dz.ICAO}
@@ -126,7 +138,8 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
                 <Text
                   style={[
                     styles.dropzoneName,
-                    dropzone === dz.ICAO && styles.dropzoneTextSelected,
+                    { color: theme.colors.textSecondary },
+                    dropzone === dz.ICAO && { color: theme.colors.background },
                   ]}
                 >
                   {dz.name}
@@ -134,12 +147,15 @@ const DropzoneModal = ({ visible, onClose }: DropzoneModalProps) => {
               </Pressable>
             ))}
             {dropZones?.length === 0 && (
-              <Text style={styles.noResults}>No dropzones found</Text>
+              <Text style={[styles.noResults, { color: theme.colors.textSecondary }]}>No dropzones found</Text>
             )}
           </ScrollView>
 
-          <Pressable style={styles.closeButton} onPress={handleClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
+          <Pressable
+            style={[styles.closeButton, { backgroundColor: theme.colors.primary }]}
+            onPress={handleClose}
+          >
+            <Text style={[styles.closeButtonText, { color: theme.colors.background }]}>Close</Text>
           </Pressable>
         </View>
       </View>
@@ -157,7 +173,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
     width: "90%",
@@ -171,12 +186,10 @@ const styles = StyleSheet.create({
   currentDropzone: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    color: "#666",
     marginBottom: 16,
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -190,41 +203,30 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: "#f5f5f5",
-  },
-  dropzoneItemSelected: {
-    backgroundColor: "#000",
   },
   dropzoneCode: {
     fontSize: 16,
     fontFamily: "Inter_600SemiBold",
-    color: "#000",
   },
   dropzoneName: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
-    color: "#666",
     marginTop: 2,
-  },
-  dropzoneTextSelected: {
-    color: "#fff",
   },
   noResults: {
     textAlign: "center",
-    color: "#666",
     fontFamily: "Inter_400Regular",
     padding: 20,
   },
   closeButton: {
-    backgroundColor: "#000",
     borderRadius: 8,
     padding: 14,
     marginTop: 12,
     alignItems: "center",
   },
   closeButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontFamily: "Inter_500Medium",
   },
 });
+

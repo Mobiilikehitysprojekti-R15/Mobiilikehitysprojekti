@@ -4,19 +4,24 @@ import { Text } from "react-native";
 import HomeScreen from "../screens/HomeScreen";
 import NewScreen from "../screens/NewScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import StatsScreen from "../screens/StatsScreen";
+import LogbookScreen from "../screens/LogbookScreen";
 import WeatherScreen from "../screens/WeatherScreen";
+import { useTheme } from "../context/ThemeContext";
 
 const Tab = createBottomTabNavigator();
 
 const BottomNavigation = () => {
+  const { theme } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#1E1E1E",
-        tabBarInactiveTintColor: "#A9A9A9",
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
         headerTitleStyle: {
           fontFamily: "Inter_700Bold",
+        },
+        tabBarStyle: {
+          backgroundColor: theme.colors.tabBarBackground,
         },
       }}
       // change this if feels bad to use, history/fullHistory maybe
@@ -33,7 +38,9 @@ const BottomNavigation = () => {
             <Text
               style={{
                 fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color,
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
                 fontSize: 10,
               }}
             >
@@ -53,7 +60,9 @@ const BottomNavigation = () => {
             <Text
               style={{
                 fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color,
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
                 fontSize: 10,
               }}
             >
@@ -73,7 +82,9 @@ const BottomNavigation = () => {
             <Text
               style={{
                 fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color,
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
                 fontSize: 10,
               }}
             >
@@ -84,7 +95,7 @@ const BottomNavigation = () => {
       />
       <Tab.Screen
         name="Logbook"
-        component={StatsScreen}
+        component={LogbookScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="pulse" size={size} color={color} />
@@ -93,11 +104,13 @@ const BottomNavigation = () => {
             <Text
               style={{
                 fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color,
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
                 fontSize: 10,
               }}
             >
-              Stats
+              Logbook
             </Text>
           ),
         }}
@@ -113,7 +126,9 @@ const BottomNavigation = () => {
             <Text
               style={{
                 fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color,
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
                 fontSize: 10,
               }}
             >

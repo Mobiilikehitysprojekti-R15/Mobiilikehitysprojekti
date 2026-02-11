@@ -12,6 +12,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import ProfileAuth from "../components/ProfileAuth";
 import StyledTextInput from "../components/StyledTextInput";
 import StyledButton from "../components/StyledButton";
@@ -43,6 +44,7 @@ type Props = {};
 
 const NewScreen = (props: Props) => {
   const { user, loading } = useAuth();
+  const { theme } = useTheme();
   const [formData, setFormData] = useState<JumpFormData>(initialFormData);
   const [submitting, setSubmitting] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -112,8 +114,8 @@ const NewScreen = (props: Props) => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.text }}>Loading...</Text>
       </View>
     );
   }
@@ -138,7 +140,10 @@ const NewScreen = (props: Props) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      style={{ backgroundColor: theme.colors.background }}
+    >
       <View style={styles.inputRow}>
         <View style={styles.inputRowItem}>
           <StyledTextInput
@@ -160,12 +165,18 @@ const NewScreen = (props: Props) => {
       </View>
 
       <View style={styles.dateContainer}>
-        <Text style={styles.dateLabel}>Jump Date</Text>
+        <Text style={[styles.dateLabel, { color: theme.colors.text }]}>Jump Date</Text>
         <TouchableOpacity
-          style={styles.dateButton}
+          style={[
+            styles.dateButton,
+            {
+              borderColor: theme.colors.border,
+              backgroundColor: theme.colors.background,
+            }
+          ]}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={styles.dateButtonText}>
+          <Text style={[styles.dateButtonText, { color: theme.colors.text }]}>
             {formatDate(formData.jumpDate)}
           </Text>
         </TouchableOpacity>
@@ -203,14 +214,15 @@ const NewScreen = (props: Props) => {
           <Text
             style={[
               styles.switchLabel,
+              { color: theme.colors.textSecondary },
               formData.releaseType === "Static line" &&
-              styles.switchLabelActive,
+              { color: theme.colors.text, fontWeight: "600" },
             ]}
           >
             Static line
           </Text>
           <TouchableOpacity
-            style={styles.switch}
+            style={[styles.switch, { backgroundColor: theme.colors.border }]}
             onPress={() =>
               updateField(
                 "releaseType",
@@ -223,6 +235,7 @@ const NewScreen = (props: Props) => {
             <View
               style={[
                 styles.switchThumb,
+                { backgroundColor: theme.colors.background },
                 formData.releaseType === "Free fall" && styles.switchThumbRight,
               ]}
             />
@@ -230,7 +243,9 @@ const NewScreen = (props: Props) => {
           <Text
             style={[
               styles.switchLabel,
-              formData.releaseType === "Free fall" && styles.switchLabelActive,
+              { color: theme.colors.textSecondary },
+              formData.releaseType === "Free fall" &&
+              { color: theme.colors.text, fontWeight: "600" },
             ]}
           >
             Free fall
@@ -244,12 +259,13 @@ const NewScreen = (props: Props) => {
           <View
             style={[
               styles.checkbox,
-              formData.isAccepted && styles.checkboxChecked,
+              { borderColor: theme.colors.primary },
+              formData.isAccepted && { backgroundColor: theme.colors.primary },
             ]}
           >
-            {formData.isAccepted && <Text style={styles.checkmark}>✓</Text>}
+            {formData.isAccepted && <Text style={[styles.checkmark, { color: theme.colors.background }]}>✓</Text>}
           </View>
-          <Text style={styles.checkboxLabel}>Accepted</Text>
+          <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Accepted</Text>
         </TouchableOpacity>
       </View>
 
@@ -311,16 +327,13 @@ const styles = StyleSheet.create({
   dateButton: {
     height: 50,
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 8,
     paddingHorizontal: 16,
-    backgroundColor: "#fff",
     justifyContent: "center",
   },
   dateButtonText: {
     fontSize: 16,
     fontFamily: "Inter_300Light",
-    color: "#000",
   },
   checkboxRow: {
     flexDirection: "row",
@@ -335,18 +348,12 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: "#000",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,
   },
-  checkboxChecked: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
   checkmark: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -360,17 +367,11 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
-    color: "#999",
-  },
-  switchLabelActive: {
-    color: "#000",
-    fontWeight: "600",
   },
   switch: {
     width: 50,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#ccc",
     justifyContent: "center",
     padding: 2,
   },
@@ -378,9 +379,9 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#fff",
   },
   switchThumbRight: {
     alignSelf: "flex-end",
   },
 });
+

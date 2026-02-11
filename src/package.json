@@ -25,6 +25,7 @@
     "expo-video": "~3.0.15",
     "expo-video-thumbnails": "~10.0.8",
     "firebase": "^12.8.0",
+    "firebase-storage": "^1.1.4",
     "gopro-telemetry": "^1.2.11",
     "gpmf-extract": "^0.3.2",
     "openmeteo": "^1.2.3",
@@ -34,7 +35,8 @@
     "react-native-gifted-charts": "^1.4.70",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "~5.6.0",
-    "react-native-screens": "~4.16.0"
+    "react-native-screens": "~4.16.0",
+    "expo-image-manipulator": "~14.0.8"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

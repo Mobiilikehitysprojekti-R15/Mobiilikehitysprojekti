@@ -1,9 +1,11 @@
 import { StatusBar } from "expo-status-bar";
+import RootNavigator from "./components/RootNavigator";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import BottomNavigation from "./components/BottomNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./context/AuthContext";
 import { DropzoneProvider } from "./context/DropzoneContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import {
   useFonts,
   Inter_100Thin,
@@ -39,13 +41,15 @@ export default function App() {
   }
 
   return (
+    <ThemeProvider>
     <AuthProvider>
       <DropzoneProvider>
         <NavigationContainer>
-          <BottomNavigation />
+          <RootNavigator/>
         </NavigationContainer>
       </DropzoneProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

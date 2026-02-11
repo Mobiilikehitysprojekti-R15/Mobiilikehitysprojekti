@@ -7,6 +7,7 @@ import {
   TouchableOpacityProps,
   ViewStyle,
 } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 type ButtonVariant = "filled" | "outline";
 
@@ -26,14 +27,16 @@ const StyledButton = ({
   variant = "filled",
   ...props
 }: StyledButtonProps) => {
+  const { theme } = useTheme();
   const isFilled = variant === "filled";
 
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        isFilled ? styles.buttonFilled : styles.buttonOutline,
         (disabled || loading) && styles.buttonDisabled,
+        { backgroundColor: isFilled ? theme.colors.primary : theme.colors.background },
+        { borderColor: isFilled ? theme.colors.primary : theme.colors.border },
         buttonStyle,
         style,
       ]}
@@ -41,9 +44,9 @@ const StyledButton = ({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={isFilled ? "#fff" : "#000"} />
+        <ActivityIndicator color={isFilled ? theme.colors.background : theme.colors.primary} />
       ) : (
-        <Text style={[styles.buttonText, isFilled ? styles.textFilled : styles.textOutline]}>
+        <Text style={[styles.buttonText, { color: isFilled ? theme.colors.background : theme.colors.primary }]}>
           {title}
         </Text>
       )}
@@ -62,14 +65,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
-  },
-  buttonFilled: {
-    backgroundColor: "#000",
-  },
-  buttonOutline: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#ccc",
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -78,11 +74,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-  },
-  textFilled: {
-    color: "#fff",
-  },
-  textOutline: {
-    color: "#000",
   },
 });

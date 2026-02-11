@@ -18,8 +18,11 @@ type Props = {
     value: number;
     text: string;
 }
+import { useTheme } from '../context/ThemeContext'
 
 export default function StatisticsTest() {
+
+    const { theme } = useTheme();
 
     const [selectedSlice, setSelectedSlice] = useState<Props | null>(null);
 
@@ -55,7 +58,7 @@ export default function StatisticsTest() {
     },[])
 
     return (
-        <View style={style.cointainer}>
+        <View style={{ backgroundColor: theme.colors.surface }}>
 
             <ScrollView style={style.scrollContainer}>
                 <PieChart
@@ -119,6 +122,20 @@ export default function StatisticsTest() {
 
         </View>
     )
+  const { theme } = useTheme();
+
+  return (
+    <View style={{ backgroundColor: theme.colors.surface }}>
+      <PieChart
+        data={[
+          { value: 40, color: 'red'},
+          { value: 30, color: 'blue' },
+          { value: 20, color: 'green' },
+          { value: 10, color: 'yellow' },
+        ]}
+      />
+    </View>
+  )
 }
 
 const style = StyleSheet.create({

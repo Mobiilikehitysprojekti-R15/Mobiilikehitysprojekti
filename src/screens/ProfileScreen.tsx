@@ -149,17 +149,20 @@ const ProfileScreen = (props: Props) => {
             <Text style={{ color: theme.colors.text }}>Date of Birth: {formatDate(profile.dateOfBirth)}</Text>
             <Text style={{ color: theme.colors.text }}>Member Since: {formatDate(profile.createdAt)}</Text>
 
-            {/*CHANGE INFO button, ei tapahu vielä mitään tästä*/}
-            <StyledButton title="Change Info" onPress={() => {}} />
+            {/*CHANGE INFO button*/}
+            <StyledButton title="Show More/Change Info" onPress={() => navigation.getParent()?.navigate("ChangeInfo")} />
+          </View>
+          <View style={styles.headingCard}>
+            <Text style={[styles.bold, { color: theme.colors.text }]}>Stats</Text>
+            <Text style={{ color: theme.colors.text }}>You have logged x amount of jumps</Text>
+
+            {/*STATS button*/}
+            <StyledButton title="View Stats" onPress={() => navigation.getParent()?.navigate("Stats")} />
           </View>
 
+          {/*NOTIFICATIONS*/}
           <View style={styles.headingCard}>
-            <Text style={styles.bold}>Stats</Text>
-            <Text>You have logged x amount of jumps</Text>
-            <Text style={[styles.bold, { color: theme.colors.text }]}>Stats</Text>
-            <Text style={{ color: theme.colors.text }}>Tähän vois laittaa montako hyppyä tehny tms pientä tietoa</Text>
-            {/*STATS button, ei tapahu vielä mitään tästä*/}
-            <StyledButton title="View Stats" onPress={() => navigation.getParent()?.navigate("Stats")} />
+            <Text style={[styles.bold, { color: theme.colors.text }]}>Notifications</Text>
           </View>
 
           {/*THEME TOGGLE*/}

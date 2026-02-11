@@ -13,6 +13,11 @@ export interface UserProfile {
   phoneNumber: string;
   dateOfBirth: string;
   createdAt: string;
+
+  notifications?: {
+    wind?: boolean;
+    weather?: boolean;
+  }
 }
 
 export interface AuthContextType {

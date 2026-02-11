@@ -1,14 +1,51 @@
-import { View, Text, Alert, Image, Button} from 'react-native'
+import { View, Text, Alert, Image, Button, StyleSheet} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import GoProTelemetry from 'gopro-telemetry'
 import * as ImagePicker from 'expo-image-picker'
+import FileSystem, { File, Directory, Paths} from 'expo-file-system'
+import RNFS  from 'react-native-fs'
+import GPMFExtract from 'gpmf-extract'
+import * as VideoThumbnails from 'expo-video-thumbnails';
 
 export default function GetGoproData() {
 
     const [video, setVideo] = useState<string | null>(null)
+    const [image, setImage] = useState<string | null>(null);
 
-    const [videoName, setVideoname] = useState<string>("")
 
+    const generateThumbnail = async (videoPath: string | null) => {
+        if(videoPath === null) return;
+    try {
+      const { uri } = await VideoThumbnails.getThumbnailAsync(
+        videoPath
+      );
+      setImage(uri);
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const convertToBase64  = async (uri : string) : Promise<ArrayBuffer> => {
+
+    let result : string | ArrayBuffer | null = ""
+
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        result = reader.result
+      };
+
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error("Error converting to base64:", error);
+      Alert.alert("Error converting to base64");
+    }
+
+    return result ? ArrayBuffer.prototype
+  };
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library.
@@ -26,42 +63,94 @@ export default function GetGoproData() {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['videos'],
             allowsEditing: false,
-            aspect: [16, 9],
             quality: 1,
         });
 
         console.log(result);
 
         if (!result.canceled) {
-            setVideo(result.assets[0].uri);
+
+            const uri = result.assets[0].uri
+
+            //const destination = new Directory(Paths.cache, 'videos');
+
+            
+
+           try {
+                
+                //destination.create();
+                //const output : string = new File(uri).textSync()
+
+                //const file : File = new File(Paths.cache, 'videos', result.assets[0].fileName?? "vid.mp4")
+                //file.write(output)
+
+                const response = await fetch(uri);
+                const blob = await response.blob();
+
+                console.log("video type ", blob.type )
+
+                GPMFExtract(blob)
+                .then(extracted => {
+                    GoProTelemetry(extracted, {}, telemetry => {
+                        console.log("telemetry succesffull")
+                        console.log(JSON.stringify(telemetry))
+                    })
+                }).catch(err => console.log(err))
+
+            } catch (error) {
+                console.error(error);
+            }
+
+            
+
+            setVideo(uri);
         }
+/*
+        try {
+            console.log("extract")
+                const file : any = await File.pickFileAsync()
 
+                const response = await fetch(file.uri);
+                const blob = await response.blob();
 
+                GPMFExtract(blob, )
+                .then(extracted => {
+                    GoProTelemetry(extracted, {}, telemetry => {
+                        console.log("telemetry succesffull")
+                        console.log(JSON.stringify(telemetry))
+                    })
+                }).catch(err => console.log(err))
+                
+            } catch (error) {
+                console.error(error);
+            }*/
+
+        generateThumbnail(video)
         
     };
 
 
-    useEffect(() => {
-
-
-        const getTelemetry = async (filePath: string| null) => {
-
-
-            //const telemetry = await goproTelemetry(input, {stream: ['ACCL'], repeatSticky:true})
-
-            //console.log(telemetry)
-        }
-
-        getTelemetry(video)
-
-    },[video])
-
 
     return (
-        <View>
+        <View style={styles.container}>
             <Button title="Pick a video from camera roll" onPress={pickImage} />
-
-            <Text>{videoName}</Text>
+            {image && <Image source={{ uri: image }}  style={styles.image} />}
+            <Text>{image}</Text>
+            <Text>{video}</Text>
         </View>
     )
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  image: {
+    width: 200,
+    height: 200,
+  },
+});

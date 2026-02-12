@@ -98,7 +98,7 @@ const BottomNavigation = () => {
         component={LogbookScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="pulse" size={size} color={color} />
+            <Ionicons name="book" size={size} color={color} />
           ),
           tabBarLabel: ({ focused, color }) => (
             <Text

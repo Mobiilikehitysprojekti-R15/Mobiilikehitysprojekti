@@ -12,7 +12,6 @@ export default function GetGoproData() {
     const [video, setVideo] = useState<string | null>(null)
     const [image, setImage] = useState<string | null>(null);
 
-
     const generateThumbnail = async (videoPath: string | null) => {
         if(videoPath === null) return;
     try {
@@ -23,28 +22,6 @@ export default function GetGoproData() {
     } catch (e) {
       console.warn(e);
     }
-  };
-
-  const convertToBase64  = async (uri : string) : Promise<ArrayBuffer> => {
-
-    let result : string | ArrayBuffer | null = ""
-
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        result = reader.result
-      };
-
-      reader.readAsDataURL(blob);
-    } catch (error) {
-      console.error("Error converting to base64:", error);
-      Alert.alert("Error converting to base64");
-    }
-
-    return result ? ArrayBuffer.prototype
   };
 
     const pickImage = async () => {
@@ -85,12 +62,16 @@ export default function GetGoproData() {
                 //file.write(output)
 
                 const response = await fetch(uri);
-                const blob = await response.blob();
+                const arrayBuffer = await response.arrayBuffer()
+                const buffer : Buffer<ArrayBufferLike> = Buffer.from(arrayBuffer)
 
-                console.log("video type ", blob.type )
 
-                GPMFExtract(blob)
+
+                GPMFExtract(buffer, {browserMode: false})
                 .then(extracted => {
+
+                  console.log("extracted...")
+
                     GoProTelemetry(extracted, {}, telemetry => {
                         console.log("telemetry succesffull")
                         console.log(JSON.stringify(telemetry))

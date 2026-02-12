@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, StyleSheet, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { PieChart, BarChart } from 'react-native-gifted-charts'
+import { useTheme } from '../context/ThemeContext'
 
 type JumpType = {
     number: number;
@@ -18,7 +19,6 @@ type Props = {
     value: number;
     text: string;
 }
-import { useTheme } from '../context/ThemeContext'
 
 export default function StatisticsTest() {
 
@@ -122,20 +122,6 @@ export default function StatisticsTest() {
 
         </View>
     )
-  const { theme } = useTheme();
-
-  return (
-    <View style={{ backgroundColor: theme.colors.surface }}>
-      <PieChart
-        data={[
-          { value: 40, color: 'red'},
-          { value: 30, color: 'blue' },
-          { value: 20, color: 'green' },
-          { value: 10, color: 'yellow' },
-        ]}
-      />
-    </View>
-  )
 }
 
 const style = StyleSheet.create({

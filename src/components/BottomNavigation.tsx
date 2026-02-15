@@ -74,28 +74,6 @@ const BottomNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="NotificationTest"
-        component={NotificationTest}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-          tabBarLabel: ({ focused, color }) => (
-            <Text
-              style={{
-                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
-                color: focused
-                  ? theme.colors.tabBarActive
-                  : theme.colors.tabBarInactive,
-                fontSize: 10,
-              }}
-            >
-              Home
-            </Text>
-          ),
-        }}
-      />
-      <Tab.Screen
         name="New"
         component={NewScreen}
         options={{
@@ -170,3 +148,29 @@ export default BottomNavigation;
 
 
 
+
+/*
+
+<Tab.Screen
+        name="NotificationTest"
+        component={NotificationTest}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
+                fontSize: 10,
+              }}
+            >
+              Home
+            </Text>
+          ),
+        }}
+      />
+*/

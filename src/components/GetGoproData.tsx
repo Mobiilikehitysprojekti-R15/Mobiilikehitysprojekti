@@ -67,11 +67,6 @@ export default function GetGoproData() {
 
         try {
 
-            //destination.create();
-            //const output : string = new File(uri).textSync()
-
-            //const file : File = new File(Paths.cache, 'videos', result.assets[0].fileName?? "vid.mp4")
-            //file.write(output)
             const file = await File.pickFileAsync().then(output => {
                 if (Array.isArray(output)) {
                     return output[0]
@@ -79,29 +74,10 @@ export default function GetGoproData() {
                 else return output
             })
 
-
-            // Read file directly with RNFS
-            //const fileBase64 = await RNFS.readFile(file.contentUri);
-
-
-            //const arrayBuffer = file.bytesSync()
-    
-
             const chunkSize = 10 * 1024 * 1024; // 10MB
-
-            //const cacheFile : File = new File(Paths.cache, 'videos', file.info.name?? "vid.mp4")
-            //cacheFile.write(file.b)
-
-            //const bytes= cacheFile.open().readBytes(chunkSize)
-
-            //const buffer: Buffer<ArrayBufferLike> = Buffer.from(bytes)
 
             const buffer: Buffer<ArrayBufferLike> = Buffer.from(file.bytesSync())
 
-
-            //const response = await fetch(uri);
-            //const arrayBuffer = await response.arrayBuffer()
-            //const buffer : Buffer<ArrayBufferLike> = Buffer.from(arrayBuffer)
 
             gpmfextract(buffer, { browserMode: false })
                 .then(extracted => {
@@ -122,12 +98,22 @@ export default function GetGoproData() {
 
 
 
+    //this is set to false because I couldn't get it working...
+    const useDataExtraction : boolean = false;
+
+
     return (
         <View style={styles.container}>
             <Button title="Pick a video from camera roll" onPress={pickImage} />
             {image && <Image source={{ uri: image }}  style={styles.image} />}
 
-            <Button title="Calculate data of the video" onPress={calculateData} />
+            {
+                useDataExtraction ? (
+                    <Button title="Calculate data of the video" onPress={calculateData} />
+                )
+                : null
+            }
+            
 
             <Text>{telemetry}</Text>
         </View>

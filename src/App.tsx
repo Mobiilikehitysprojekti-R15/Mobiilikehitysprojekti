@@ -19,7 +19,35 @@ import {
   Inter_900Black,
 } from "@expo-google-fonts/inter";
 
+import * as Notifications from 'expo-notifications';
+import { cancelAllScheduledNotificationsAsync, dismissAllNotificationsAsync } from "expo-notifications";
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
+Notifications.scheduleNotificationAsync({
+  content:{
+    title: "Conditions in your dropzone",
+    body: "Check the weather in your dropzone and see if it's a good day for skydiving!",
+
+  },
+  trigger: {
+    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+    seconds: 60 * 60 * 24, // every 24 hours
+    repeats: true
+  }
+})
+
 export default function App() {
+
+  
   const [fontsLoaded] = useFonts({
     Inter_100Thin,
     Inter_200ExtraLight,
@@ -39,6 +67,7 @@ export default function App() {
       </View>
     );
   }
+
 
   return (
     <ThemeProvider>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "560653783161",
+    "project_id": "laskuvarjohyppysovellus",
+    "storage_bucket": "laskuvarjohyppysovellus.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560653783161:android:a71b9b04cd12db91ff44a8",
+        "android_client_info": {
+          "package_name": "com.n1ppesorganization.skydiveapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "560653783161-k8l76hpo0qpficm64htip2dslcln7hfi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoyRhbZG-LbdGuzJ69PEHSzyXNWdIUWDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "560653783161-k8l76hpo0qpficm64htip2dslcln7hfi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

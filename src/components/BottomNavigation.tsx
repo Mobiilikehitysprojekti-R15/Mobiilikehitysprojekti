@@ -7,6 +7,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import LogbookScreen from "../screens/LogbookScreen";
 import WeatherScreen from "../screens/WeatherScreen";
 import { useTheme } from "../context/ThemeContext";
+import NotificationTest from "../screens/NotificationScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -49,6 +50,7 @@ const BottomNavigation = () => {
           ),
         }}
       />
+      
       <Tab.Screen
         name="Weather"
         component={WeatherScreen}
@@ -67,6 +69,28 @@ const BottomNavigation = () => {
               }}
             >
               Weather
+            </Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="NotificationTest"
+        component={NotificationTest}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium",
+                color: focused
+                  ? theme.colors.tabBarActive
+                  : theme.colors.tabBarInactive,
+                fontSize: 10,
+              }}
+            >
+              Home
             </Text>
           ),
         }}
@@ -142,3 +166,7 @@ const BottomNavigation = () => {
 };
 
 export default BottomNavigation;
+
+
+
+

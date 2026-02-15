@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Mobiilikehitysprojekti",
-    "slug": "Mobiilikehitysprojekti",
+    "name": "SkydiveApp",
+    "slug": "skydiveapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.n1ppesorganization.skydiveapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +25,9 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.n1ppesorganization.skydiveapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +36,12 @@
       "expo-font",
       "@react-native-community/datetimepicker",
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "39c87c39-cfbf-47c0-b220-133fbec19a29"
+      }
+    },
+    "owner": "n1ppes-organization"
   }
 }

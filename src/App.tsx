@@ -23,7 +23,11 @@ import * as Notifications from 'expo-notifications';
 import { cancelAllScheduledNotificationsAsync, dismissAllNotificationsAsync } from "expo-notifications";
 
 
-Notifications.setNotificationHandler({
+
+
+export default function App() {
+
+  Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
     shouldSetBadge: true,
@@ -32,22 +36,47 @@ Notifications.setNotificationHandler({
   }),
 });
 
-Notifications.scheduleNotificationAsync({
-  content:{
-    title: "Conditions in your dropzone",
-    body: "Check the weather in your dropzone and see if it's a good day for skydiving!",
 
-  },
-  trigger: {
-    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-    seconds: 60 * 60 * 24, // every 24 hours
-    repeats: true
-  }
-})
+  Notifications.getNotificationCategoriesAsync().then((categories) => {
+    console.log("Current notification categories:", categories);
 
-export default function App() {
+    if (categories.some(category => category.identifier === "weatherUpdates")) {
+      console.log("weatherUpdates category already exists, skipping creation");
+    }
 
-  
+    else {
+      Notifications.setNotificationCategoryAsync("weatherUpdates", [
+        {
+          identifier: "viewWeather",
+          buttonTitle: "View Weather",
+          options: {
+            opensAppToForeground: true,
+          },
+        },
+      ]);
+
+
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Conditions in your dropzone",
+          body: "Check the weather in your dropzone and see if it's a good day for skydiving!",
+          data: { screen: "Weather" },
+          categoryIdentifier: "weatherUpdates",
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: 60 * 60 * 24, // every 24 hours
+          repeats: true
+        }
+      }).then((id) => console.log("Scheduled notification with ID:", id))
+        .catch((error) => console.error("Error scheduling notification:", error));
+    }
+
+  }).catch((error) => {
+    console.error("Error fetching notification categories:", error);
+  });
+
+
   const [fontsLoaded] = useFonts({
     Inter_100Thin,
     Inter_200ExtraLight,

@@ -28,22 +28,26 @@ import { cancelAllScheduledNotificationsAsync, dismissAllNotificationsAsync } fr
 export default function App() {
 
   Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+    handleNotification: async () => ({
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  
 
 
   Notifications.getNotificationCategoriesAsync().then((categories) => {
     console.log("Current notification categories:", categories);
 
+
     if (categories.some(category => category.identifier === "weatherUpdates")) {
       console.log("weatherUpdates category already exists, skipping creation");
     }
 
+    
     else {
       Notifications.setNotificationCategoryAsync("weatherUpdates", [
         {
@@ -64,9 +68,9 @@ export default function App() {
           categoryIdentifier: "weatherUpdates",
         },
         trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-          seconds: 60 * 60 * 24, // every 24 hours
-          repeats: true
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: 8,
+          minute: 0,
         }
       }).then((id) => console.log("Scheduled notification with ID:", id))
         .catch((error) => console.error("Error scheduling notification:", error));
@@ -100,13 +104,13 @@ export default function App() {
 
   return (
     <ThemeProvider>
-    <AuthProvider>
-      <DropzoneProvider>
-        <NavigationContainer>
-          <RootNavigator/>
-        </NavigationContainer>
-      </DropzoneProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <DropzoneProvider>
+          <NavigationContainer>
+            <RootNavigator />
+          </NavigationContainer>
+        </DropzoneProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

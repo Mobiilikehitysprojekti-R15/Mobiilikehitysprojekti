@@ -5,18 +5,18 @@ import ProfileAuth from "../components/ProfileAuth";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { db } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { UserProfile } from "../types/auth";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { updateDoc } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type RootStackParamList = {
   Tabs: undefined;
   Stats: undefined;
+  ChangeInfo: undefined;
 };
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Tabs">;
@@ -27,36 +27,63 @@ const ProfileScreen = (props: Props) => {
   const { theme, toggleTheme, isDark } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [jumpCount, setJumpCount] = useState<number | null>(null);
 
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
+  const [notifications, setNotifications] = useState<{ [key: string]: boolean }>({
+    notification1: false,
+  });
+
+  const toggleNotification = (key: string) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const storage = getStorage();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) {
+  const fetchProfile = async () => {
+    if (!user) {
+      setProfile(null);
+      return;
+    }
+
+    setProfileLoading(true);
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile(docSnap.data() as UserProfile);
+      } else {
         setProfile(null);
-        return;
       }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
-      setProfileLoading(true);
+  useEffect(() => {
+    fetchProfile();
+  }, [user]);
+
+  // FETCH JUMPS COUNT
+  useEffect(() => {
+    const fetchJumpCount = async () => {
+      if (!user) return;
+
       try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
-        } else {
-          setProfile(null);
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setProfileLoading(false);
+        const jumpsRef = collection(db, "jumps");
+        const q = query(jumpsRef, where("userId", "==", user.uid));
+        const snapshot = await getDocs(q);
+        setJumpCount(snapshot.size);
+      } catch (err) {
+        console.error("Failed to fetch jumps:", err);
       }
     };
 
-    fetchProfile();
+    fetchJumpCount();
   }, [user]);
 
   const formatDate = (dateString: string | undefined) => {
@@ -150,12 +177,19 @@ const ProfileScreen = (props: Props) => {
             <Text style={{ color: theme.colors.text }}>Member Since: {formatDate(profile.createdAt)}</Text>
 
             {/*CHANGE INFO button*/}
-            <StyledButton title="Show More/Change Info" onPress={() => navigation.getParent()?.navigate("ChangeInfo")} />
+            <StyledButton title="Show More/Change Info"
+              onPress={() =>
+                navigation.getParent()?.navigate("ChangeInfo", {
+                  onSave: () => fetchProfile(), 
+                })
+              } />
           </View>
+
+          {/*STATS*/}
           <View style={styles.headingCard}>
             <Text style={[styles.bold, { color: theme.colors.text }]}>Stats</Text>
-            <Text style={{ color: theme.colors.text }}>You have logged x amount of jumps</Text>
-
+            {/*LOGGED JUMPS count*/}
+            <Text style={{ color: theme.colors.text }}>You have logged {jumpCount} jumps</Text>
             {/*STATS button*/}
             <StyledButton title="View Stats" onPress={() => navigation.getParent()?.navigate("Stats")} />
           </View>
@@ -163,6 +197,24 @@ const ProfileScreen = (props: Props) => {
           {/*NOTIFICATIONS*/}
           <View style={styles.headingCard}>
             <Text style={[styles.bold, { color: theme.colors.text }]}>Notifications</Text>
+
+            <View style={styles.checkboxRow}>
+              <TouchableOpacity
+                style={[
+                  styles.checkbox,
+                  {
+                    borderColor: theme.colors.border,
+                    backgroundColor: notifications.notification1 ? theme.colors.primary : theme.colors.surface,
+                  },
+                ]}
+                onPress={() => toggleNotification("notification1")}
+              >
+                {notifications.notification1 && (
+                  <Text style={[styles.checkmark, { color: theme.colors.surface }]}>✓</Text>
+                )}
+              </TouchableOpacity>
+              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Notification 1</Text>
+            </View>
           </View>
 
           {/*THEME TOGGLE*/}
@@ -233,4 +285,27 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+
+  checkboxRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginTop: 10,
+  marginBottom: 10,
+},
+checkbox: {
+  width: 24,
+  height: 24,
+  borderWidth: 2,
+  borderRadius: 4,
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: 8,
+},
+checkmark: {
+  fontSize: 16,
+  fontWeight: "bold",
+},
+checkboxLabel: {
+  fontSize: 16,
+},
 });

@@ -17,24 +17,19 @@ export interface DropzoneModalProps {
 
 // doesnt account for countries but oh well - comments have no metar data
 export const DROPZONES = [
-    { code: "EFOU", name: "Oulu Airport" },
-    { code: "EFTU", name: "Turku Airport" },
-    //{ code: "EFHF", name: "Helsinki-Malmi Airport" },
-    { code: "EFTP", name: "Tampere-Pirkkala Airport" },
-    { code: "EFJY", name: "Jyväskylä Airport" },
-    { code: "EFUT", name: "Utti Airport" },
-    //{ code: "EFLA", name: "Lahti-Vesivehmaa Airport" },
-    //{ code: "EFIM", name: "Immola Airfield" },
-    { code: "EFKE", name: "Kemi-Tornio Airport" },
-    { code: "EFKU", name: "Kuopio Airport" },
-    { code: "EFPO", name: "Pori Airport" },
-    { code: "EFVA", name: "Vaasa Airport" },
-    //{ code: "EFAL", name: "Alavus Airfield" },
-    { code: "EFKI", name: "Kajaani Airport" },
-    { code: "EFRO", name: "Rovaniemi Airport" },
-    //{ code: "EFJM", name: "Jämijärvi Airfield" },
-    { code: "EFHK", name: "Helsinki-Vantaa Airport" },
-    { code: "EFSI", name: "Seinäjoki Airport" },
+    {
+        ICAO: "EFOU",
+        name: "Oulu skydive censsster",
+        country: "Finlandssss"
+    }
 ] as const;
 
-export type DropzoneCode = (typeof DROPZONES)[number]["code"];
+
+export type dropzoneType = {
+    ICAO : string,
+    name: string,
+    country: string
+}
+
+
+export type DropzoneCode = (typeof DROPZONES)[number]["ICAO"];

@@ -103,7 +103,8 @@ const NewScreen = (props: Props) => {
       });
 
       Alert.alert("Success", "Jump added successfully");
-      setFormData(initialFormData);
+      const nextJumpNumber = formData.jumpNumber ? String(Number(formData.jumpNumber) + 1) : "1";
+      setFormData({ ...initialFormData, jumpNumber: nextJumpNumber });
     } catch (error) {
       console.error("Error adding jump:", error);
       Alert.alert("Error", "Failed to add jump. Please try again.");

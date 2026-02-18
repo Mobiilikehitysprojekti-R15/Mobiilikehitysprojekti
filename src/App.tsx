@@ -19,7 +19,68 @@ import {
   Inter_900Black,
 } from "@expo-google-fonts/inter";
 
+import * as Notifications from 'expo-notifications';
+import { cancelAllScheduledNotificationsAsync, dismissAllNotificationsAsync } from "expo-notifications";
+
+
+
+
 export default function App() {
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  
+
+
+  Notifications.getNotificationCategoriesAsync().then((categories) => {
+    console.log("Current notification categories:", categories);
+
+
+    if (categories.some(category => category.identifier === "weatherUpdates")) {
+      console.log("weatherUpdates category already exists, skipping creation");
+    }
+
+    
+    else {
+      Notifications.setNotificationCategoryAsync("weatherUpdates", [
+        {
+          identifier: "viewWeather",
+          buttonTitle: "View Weather",
+          options: {
+            opensAppToForeground: true,
+          },
+        },
+      ]);
+
+
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Conditions in your dropzone",
+          body: "Check the weather in your dropzone and see if it's a good day for skydiving!",
+          data: { screen: "Weather" },
+          categoryIdentifier: "weatherUpdates",
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: 8,
+          minute: 0,
+        }
+      }).then((id) => console.log("Scheduled notification with ID:", id))
+        .catch((error) => console.error("Error scheduling notification:", error));
+    }
+
+  }).catch((error) => {
+    console.error("Error fetching notification categories:", error);
+  });
+
+
   const [fontsLoaded] = useFonts({
     Inter_100Thin,
     Inter_200ExtraLight,
@@ -40,15 +101,16 @@ export default function App() {
     );
   }
 
+
   return (
     <ThemeProvider>
-    <AuthProvider>
-      <DropzoneProvider>
-        <NavigationContainer>
-          <RootNavigator/>
-        </NavigationContainer>
-      </DropzoneProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <DropzoneProvider>
+          <NavigationContainer>
+            <RootNavigator />
+          </NavigationContainer>
+        </DropzoneProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

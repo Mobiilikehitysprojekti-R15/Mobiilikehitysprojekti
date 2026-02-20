@@ -16,11 +16,6 @@ export default function WeatherScreen() {
 
     const LOCATION : string = dropzone || "EFOU"; //Oulun lentoasema ICAO koodi
 
-    //tee parempi tapa määritellä turvallisuusrajat riippuen lisensseistä ja hyppytyypistä (tandem on 11/ms)
-    const maxWindGustLimitSTUDENT : number = 8; //m/s
-    const maxWindGustLimitLICENSE_B : number = 11; //m/s
-    const maxCloudCoverLimitSTUDENT : number = 75; //prosenttia
-
     const [windSpeedType, setWindSpeedType] = React.useState<'KT' | 'MS'>('KT'); //KT or MS
     const [dropzoneModalVisible, setDropzoneModalVisible] = useState(false);
 
@@ -33,6 +28,13 @@ export default function WeatherScreen() {
         getLatitude,
         getLongitude,
         metarObject,
+        isJumpSafe,
+        isNight,
+        knotsToMs,
+        msToKnots,
+        maxCloudCoverLimitSTUDENT,
+        maxWindGustLimitLICENSE_B,
+        maxWindGustLimitSTUDENT
     } = useWeather({ icaoCode: LOCATION, windSpeedType: windSpeedType });
 
 
@@ -77,52 +79,7 @@ export default function WeatherScreen() {
     };
 
 
-    const isNight = (date: Date): boolean => {
-
-        const hours = date.getHours();
-            return hours < 6 || hours > 22;
-
-            /*
-            alternative way
-        if(current === null || current.is_day === undefined){
-            const hours = date.getHours();
-            return hours < 6 || hours > 22;
-        }
-        else{
-            return current.is_day === 0; //is_day is 1 during day and 0 during night
-        }
-            */
-        
-    }
-
-    const isJumpSafe = (): boolean | null => {
-
-      if(current === null){
-            return null; //no data
-        }
-
-      if(isNight(current!.time!)){
-            return false; //night time jumping not allowed for students
-        }
-
-        if (current?.wind_gusts_10m !== undefined && metarObject?.cover !== undefined ) {
-            const windGustsCurrent = current.wind_gusts_10m!;
-
-            const windGusts = (windSpeedType === 'KT') ? knotsToMs(windGustsCurrent) : windGustsCurrent;
-
-            return windGusts <= maxWindGustLimitSTUDENT && metarObject?.cover != "OVC" && metarObject?.cover != "BKN";
-        }
-        return null; //unsure
-    }
-
-    //convert from knots to m/s and vice versa
-    const knotsToMs = (knots: number): number => {
-        return knots * 0.514444;
-    }
-
-    const msToKnots = (ms: number): number => {
-        return ms / 0.514444;
-    }
+    
 
     const isaCorrection = (altitude: number, temperature: number | undefined): string => {
         if (temperature === null || temperature === undefined) {

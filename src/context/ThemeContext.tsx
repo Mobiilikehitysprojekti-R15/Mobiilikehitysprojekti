@@ -31,15 +31,15 @@ type ThemeContextType = {
 const lightTheme: Theme = {
   colors: {
     background: "#FFFFFF",
-    surface: "#e1c0c0",
+    surface: "#e5e5e5",
     text: "#1E1E1E",
     textSecondary: "#363636",
-    primary: "#ed8383",
+    primary: "#ff9393",
     primaryVariant: "#333333",
     error: "#FF3B30",
     success: "#34C759",
     warning: "#FF9500",
-    border: "#E0E0E0",
+    border: "#525252",
     tabBarBackground: "#FFFFFF",
     tabBarActive: "#ff9393",
     tabBarInactive: "#A9A9A9",

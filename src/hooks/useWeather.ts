@@ -21,6 +21,55 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
 
     const [metarObject, setMetarObject] = React.useState<metarType | null>(null);
 
+    const isNight = (date: Date): boolean => {
+
+        const hours = date.getHours();
+            return hours < 6 || hours > 22;
+
+            /*
+            alternative way
+        if(current === null || current.is_day === undefined){
+            const hours = date.getHours();
+            return hours < 6 || hours > 22;
+        }
+        else{
+            return current.is_day === 0; //is_day is 1 during day and 0 during night
+        }
+            */
+        
+    }
+
+    const maxWindGustLimitSTUDENT : number = 8; //m/s
+    const maxWindGustLimitLICENSE_B : number = 11; //m/s
+    const maxCloudCoverLimitSTUDENT : number = 75; //prosenttia
+
+    const knotsToMs = (knots: number): number => {
+        return knots * 0.514444;
+    }
+
+    const msToKnots = (ms: number): number => {
+        return ms / 0.514444;
+    }
+
+    const isJumpSafe = (): boolean | null => {
+
+      if(current === null){
+            return null; //no data
+        }
+
+      if(isNight(current!.time!)){
+            return false; //night time jumping not allowed for students
+        }
+
+        if (current?.wind_gusts_10m !== undefined && metarObject?.cover !== undefined ) {
+            const windGustsCurrent = current.wind_gusts_10m!;
+
+            const windGusts = (windSpeedType === 'KT') ? knotsToMs(windGustsCurrent) : windGustsCurrent;
+
+            return windGusts <= maxWindGustLimitSTUDENT && metarObject?.cover != "OVC" && metarObject?.cover != "BKN";
+        }
+        return null; //unsure
+    }
 
 
     useEffect(() => {
@@ -180,5 +229,12 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
         getLatitude,
         getLongitude,
         metarObject,
+        isJumpSafe,
+        isNight,
+        knotsToMs,
+        msToKnots,
+        maxCloudCoverLimitSTUDENT,
+        maxWindGustLimitLICENSE_B,
+        maxWindGustLimitSTUDENT
      };
 }

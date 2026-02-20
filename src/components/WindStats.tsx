@@ -10,7 +10,7 @@ const WindStats = () => {
     const navigation = useNavigation();
     const { dropzone, loading: dropzoneLoading } = useDropzone();
     const { theme } = useTheme();
-    const { metarData } = useWeather({ icaoCode: dropzone });
+    const { metarData, isJumpSafe } = useWeather({ icaoCode: dropzone });
 
     const handleSeeMore = () => {
         navigation.navigate("Weather" as never);
@@ -36,6 +36,9 @@ const WindStats = () => {
             </View>
             <Text style={[styles.metarText, { color: theme.colors.text }]}>
                 {metarData || "No METAR data available"}
+            </Text>
+            <Text style={[styles.jumpSafetyText, { color: isJumpSafe() ? theme.colors.success : theme.colors.error }]}>
+                Jumping is {isJumpSafe() ? "safe" : "dangerous"} at the moment.
             </Text>
             <Pressable
                 style={[styles.seeMoreButton, { backgroundColor: theme.colors.primary }]}
@@ -81,6 +84,11 @@ const styles = StyleSheet.create({
     seeMoreButtonText: {
         fontSize: 14,
         fontFamily: "Inter_500Medium",
+    },
+    jumpSafetyText: {
+        fontSize: 14,
+        fontFamily: "Inter_500Medium",
+        marginBottom: 12,
     },
 });
 

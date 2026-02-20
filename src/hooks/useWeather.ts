@@ -83,7 +83,6 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
             };
 
             const data = await fetchWeatherApi(url, params);
-
             const utcOffsetSeconds = data[0].utcOffsetSeconds();
 
             const hourly = data[0].hourly()!;
@@ -146,7 +145,6 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
                     wind_direction_700hPa: hourly.variables(36)!.valuesArray(),
                     wind_direction_600hPa: hourly.variables(37)!.valuesArray(),
                     cloud_cover_low: hourly.variables(38)!.valuesArray(),
-
                 },
                 minutely_15: {
                     time: Array.from(

@@ -189,6 +189,7 @@ const ChangeInfoScreen = () => {
             onFocus={() => setShowDatePicker(true)}
           />
 
+          
           {showDatePicker && (
 
             <View>
@@ -201,49 +202,11 @@ const ChangeInfoScreen = () => {
                 if (date) handleChange("dateOfBirth", date.toISOString());
               }}
             />
-
-            <DateTimePicker
-              value={form.reserveExpires ? new Date(form.reserveExpires) : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowReserveExpiresPicker(false);
-                if (date) handleChange("reserveExpires", date.toISOString());
-              }}
-            />
-
-            <DateTimePicker
-              value={form.landingExpires ? new Date(form.landingExpires) : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowLandingExpiresPicker(false);
-                if (date) handleChange("landingExpires", date.toISOString());
-              }}
-            />
-
-            <DateTimePicker
-              value={form.healthGuaranteeExpires ? new Date(form.healthGuaranteeExpires) : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowHealthGuaranteeExpiresPicker(false);
-                if (date) handleChange("healthGuaranteeExpires", date.toISOString());
-              }}
-            />
-
-            <DateTimePicker
-              value={form.exitExpires ? new Date(form.exitExpires) : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowExitExpiresPicker(false);
-                if (date) handleChange("exitExpires", date.toISOString());
-              }}
-            />
             </View>
-            
           )}
+
+          
+
 
 
 
@@ -281,7 +244,55 @@ const ChangeInfoScreen = () => {
               })}
             </View>
           </View>
-          
+        
+
+        {
+            form.licenseType === "Student" && (
+
+              <View style={{ marginBottom: 16 }}>
+                <StyledTextInput
+                  label="Exit test expires"
+                  value={form.exitExpires ? new Date(form.exitExpires).toLocaleDateString() : ""}
+                  onFocus={() => setShowExitExpiresPicker(true)}
+                />
+                <StyledTextInput
+                  label="Reserve test expires"
+                  value={form.reserveExpires ? new Date(form.reserveExpires).toLocaleDateString() : ""}
+                  onFocus={() => setShowReserveExpiresPicker(true)}
+                />
+              </View>
+            )
+          }
+
+
+          {showExitExpiresPicker && (
+
+            <View>
+              <DateTimePicker
+              value={new Date(Date.now())}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowExitExpiresPicker(false);
+                if (date) handleChange("exitExpires", date.toISOString());
+              }}
+            />
+            </View>
+          )}
+          {showReserveExpiresPicker && (
+
+            <View>
+              <DateTimePicker
+              value={new Date(Date.now())}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowReserveExpiresPicker(false);
+                if (date) handleChange("reserveExpires", date.toISOString());
+              }}
+            />
+            </View>
+          )}
 
 
           <StyledTextInput label="Club" value={form.club} onChangeText={(v) => handleChange("club", v)} />

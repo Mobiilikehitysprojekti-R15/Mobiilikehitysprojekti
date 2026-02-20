@@ -277,7 +277,7 @@ const ProfileScreen = (props: Props) => {
                   <Text style={[styles.checkmark, { color: theme.colors.surface }]}>✓</Text>
                 )}
               </TouchableOpacity>
-              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Notification 1</Text>
+              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Set Notifications</Text>
             </View>
           </View>
 

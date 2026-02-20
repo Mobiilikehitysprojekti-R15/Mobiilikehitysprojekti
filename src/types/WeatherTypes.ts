@@ -7,6 +7,9 @@ export type currentWeather = {
     wind_speed_10m?: number,
     cloud_cover?: number,
     weather_code?: number,
+    cloud_cover_low?: number,
+    temperature_2m?: number,
+    is_day?: number,
 }
 export type hourlyWeather = {
     time: Date[],
@@ -48,6 +51,7 @@ export type hourlyWeather = {
     wind_direction_1000hPa?: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_700hPa?: Float32Array<ArrayBufferLike> | null | undefined,
     wind_direction_600hPa?: Float32Array<ArrayBufferLike> | null | undefined,
+    cloud_cover_low?: Float32Array<ArrayBufferLike> | null | undefined,
 }
 
 export type fifteenMinuteWeather = {

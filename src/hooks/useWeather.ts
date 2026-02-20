@@ -74,12 +74,12 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
                     "cloud_cover_950hPa", "cloud_cover_925hPa", "cloud_cover_900hPa", "cloud_cover_850hPa", "cloud_cover_800hPa", "cloud_cover_700hPa",
                     "cloud_cover_600hPa", "wind_speed_975hPa", "wind_speed_900hPa", "wind_speed_800hPa", "wind_speed_850hPa", "wind_direction_800hPa",
                     "wind_direction_850hPa", "wind_direction_900hPa", "wind_direction_925hPa", "wind_direction_950hPa", "wind_direction_975hPa",
-                    "wind_direction_1000hPa", "wind_direction_700hPa", "wind_direction_600hPa"],
-
-                current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code"],
+                    "wind_direction_1000hPa", "wind_direction_700hPa", "wind_direction_600hPa", "cloud_cover_low"],
+                current: ["wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "weather_code", "cloud_cover_low", "temperature_2m", "is_day"],
                 minutely_15: ["wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_direction_10m", "wind_direction_80m", "wind_gusts_10m", "visibility"],
                 wind_speed_unit: (windSpeedType === 'KT') ? "kn" : "ms",
                 forecast_minutely_15: 48,
+                past_minutely_15: 48,
             };
 
             const data = await fetchWeatherApi(url, params);
@@ -98,6 +98,9 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
                     wind_speed_10m: current.variables(2)!.value(),
                     cloud_cover: current.variables(3)!.value(),
                     weather_code: current.variables(4)!.value(),
+                    cloud_cover_low: current.variables(5)!.value(),
+                    temperature_2m: current.variables(6)!.value(),
+                    is_day: current.variables(7)!.value(),
                 },
                 hourly: {
                     time: Array.from(
@@ -142,6 +145,7 @@ export default function useWeather({ icaoCode, windSpeedType }: Props) {
                     wind_direction_1000hPa: hourly.variables(35)!.valuesArray(),
                     wind_direction_700hPa: hourly.variables(36)!.valuesArray(),
                     wind_direction_600hPa: hourly.variables(37)!.valuesArray(),
+                    cloud_cover_low: hourly.variables(38)!.valuesArray(),
 
                 },
                 minutely_15: {

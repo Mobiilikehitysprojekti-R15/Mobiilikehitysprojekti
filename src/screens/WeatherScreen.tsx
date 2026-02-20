@@ -45,8 +45,22 @@ export default function WeatherScreen() {
 
         const filtered: Array<{ value: number; index: number }> = [{ value: values[0], index: 0 }];
 
+        //make sure it cannot be more than 2, so that not too many datapoints are removed if there is a sudden change in values
+        let lastOffset : number = 0;
+
         for (let i = 1; i < values.length; i++) {
+
+            if(lastOffset > 2){
+                    lastOffset = 0;
+                    filtered.push({ value: values[i], index: i });
+                    continue
+                }
+
             if (Math.abs(values[i] - filtered[filtered.length - 1].value) > threshold) {
+
+                lastOffset++;
+                
+
                 filtered.push({ value: values[i], index: i });
             }
         }
@@ -64,8 +78,21 @@ export default function WeatherScreen() {
 
 
     const isNight = (date: Date): boolean => {
+
         const hours = date.getHours();
-        return hours < 6 || hours > 22;
+            return hours < 6 || hours > 22;
+
+            /*
+            alternative way
+        if(current === null || current.is_day === undefined){
+            const hours = date.getHours();
+            return hours < 6 || hours > 22;
+        }
+        else{
+            return current.is_day === 0; //is_day is 1 during day and 0 during night
+        }
+            */
+        
     }
 
     const isJumpSafe = (): boolean | null => {
@@ -78,25 +105,12 @@ export default function WeatherScreen() {
             return false; //night time jumping not allowed for students
         }
 
-        if (current?.wind_gusts_10m !== undefined && current?.cloud_cover !== undefined) {
-            const windGusts = current.wind_gusts_10m!;
-            const cloudCover = current.cloud_cover!;
+        if (current?.wind_gusts_10m !== undefined && metarObject?.cover !== undefined ) {
+            const windGustsCurrent = current.wind_gusts_10m!;
 
-            if(windSpeedType === 'KT'){
-                //convert to m/s for checking
-                const windGustsMs = windGusts * 0.514444;
-                if (windGustsMs <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
-                    return true; //safe
-                } else {
-                    return false; //dangerous
-                }
-            }else{
-                if (windGusts <= maxWindGustLimitSTUDENT && cloudCover <= maxCloudCoverLimitSTUDENT) {
-                    return true; //safe
-                } else {
-                    return false; //dangerous
-                }
-            }
+            const windGusts = (windSpeedType === 'KT') ? knotsToMs(windGustsCurrent) : windGustsCurrent;
+
+            return windGusts <= maxWindGustLimitSTUDENT && metarObject?.cover != "OVC" && metarObject?.cover != "BKN";
         }
         return null; //unsure
     }
@@ -108,6 +122,15 @@ export default function WeatherScreen() {
 
     const msToKnots = (ms: number): number => {
         return ms / 0.514444;
+    }
+
+    const isaCorrection = (altitude: number, temperature: number | undefined): string => {
+        if (temperature === null || temperature === undefined) {
+            return "Unknown"; //no data
+        }
+        //ISA temperature at sea level is something and it decreases by 6.5°C per 1000m
+        const isaTemperature = temperature - (6.5 * (altitude / 1000));
+        return isaTemperature.toFixed(0).toString() + "°C";
     }
 
 
@@ -147,21 +170,20 @@ export default function WeatherScreen() {
                 <Text style={{ color: theme.colors.textSecondary }}>Wind and weather data for {getLatitude}, {getLongitude}</Text>
 
                 <Text style={[styles.lowerTitle, { color: isJumpSafe() ? theme.colors.success : theme.colors.error }]}>
-                    Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure"}
+                    Jumping is probably {isJumpSafe() ? "safe" : !isJumpSafe() ? "dangerous" : "unsure if jumping is safe"} at the moment.
                 </Text>
 
+                <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Temperature at 4km : {isaCorrection(4000, current?.temperature_2m)}</Text>
+
                 {current && (
-                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+                    <View style={[styles.container]}>
                         <Text style={{ color: theme.colors.text }}>Time: {current.time?.toLocaleString()}</Text>
                         <Text style={{ color: theme.colors.text }}>Wind Gusts 10m: {current.wind_gusts_10m?.toFixed(2)} {windSpeedType === 'KT' ? 'KT' : 'm/s'}</Text>
-                        <Text style={{ color: theme.colors.text }}>Cloud Cover: {current.cloud_cover}%</Text>
                         <Text style={{ color: theme.colors.text }}>Wind direction 10m: {current.wind_direction_10m} °</Text>
                         <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>METAR:</Text>
                         <Text style={{ color: theme.colors.textSecondary }}>{metarData}</Text>
-                        <Text style={{ color: theme.colors.text }}>Temperature: {metarObject?.temp} °C</Text>
                         <Text style={{ color: theme.colors.text }}>Wind Speed: {metarObject?.wspd} KT</Text>
                         <Text style={{ color: theme.colors.text }}>Wind Direction: {metarObject?.wdir} °</Text>
-                        <Text style={{ color: theme.colors.text }}>Visibility: {metarObject?.visib ? metarObject?.visib : "unknown"} miles</Text>
 
                     </View>
                 )}
@@ -169,13 +191,13 @@ export default function WeatherScreen() {
 
                 {minutely15 && (
 
-                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+                    <View style={[styles.container]}>
 
                         <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>Wind gust forecast:</Text>
-                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind Gusts (next 8 hours):</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind Gusts (next 12 hours):</Text>
 
                         <LineChart
-                            data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 31), 0.1)
+                            data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(48, 96), 0.1)
                                 .map((item, newIndex) => ({ value: item.value,  label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
 
                             data2={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitSTUDENT) : maxWindGustLimitSTUDENT)})}
@@ -212,16 +234,14 @@ export default function WeatherScreen() {
                             initialSpacing={0}
                         />
 
-                    </View>
-                )}
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Yellow line: Maximum wind gust limit for student pilots</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Red line: Maximum wind gust limit for licensed pilots, tandems</Text>
 
-                {hourly && (
-                    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
                         <Text style={[styles.lowerTitle, { color: theme.colors.text }]}>Hourly Weather:</Text>
-                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind gusts 10m (previus 24 hours):</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Wind gusts 10m (previous 12 hours):</Text>
                         <LineChart
-                            data={hourly.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(hourly.wind_gusts_10m).slice(0, 24), 0.5)
-                                .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
+                            data={minutely15.wind_gusts_10m ? filterCloseValuesWithIndex(Array.from(minutely15.wind_gusts_10m).slice(0, 24), 0.1)
+                                .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(minutely15.time)[item.index] : '' })) : []}
                             data2={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitSTUDENT) : maxWindGustLimitSTUDENT)})}
                             data3={Array(24).fill({ value: (windSpeedType === 'KT' ? msToKnots(maxWindGustLimitLICENSE_B) : maxWindGustLimitLICENSE_B) })}
                             color2='yellow'
@@ -253,12 +273,49 @@ export default function WeatherScreen() {
                             yAxisTextStyle={{ color: theme.colors.textSecondary }}
                             initialSpacing={0}
                         />
+
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Yellow line: Maximum wind gust limit for student pilots</Text>
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Red line: Maximum wind gust limit for licensed pilots, tandems</Text>
+
+                    </View>
+                )}
+
+                {hourly && (
+                    <View style={[styles.container]}>
+
+                        <Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>Cloud cover (previous 24 hours):</Text>
+                        <LineChart
+                            data={hourly.cloud_cover_low ? filterCloseValuesWithIndex(Array.from(hourly.cloud_cover_low).slice(0, 24), 2)
+                                .map((item, newIndex) => ({ value: item.value, label: (newIndex % 2 === 0) ? getTimeLabels(hourly.time)[item.index] : '' })) : []}
+                            thickness1={4}
+                            color1='gray'
+                            areaChart1={true}
+                            startFillColor={'gray'}
+                            hideDataPoints={true}
+                            width={250}
+                            height={200}
+                            adjustToWidth={true}
+                            yAxisLabelSuffix={'%'}
+                            xAxisLabelTextStyle={{ fontSize: 10, color: theme.colors.textSecondary }}
+                            xAxisTextNumberOfLines={2}
+                            allowFontScaling={true}
+                            yAxisLabelWidth={70}
+                            noOfSections={4}
+                            hideRules={false}
+                            hideAxesAndRules={false}
+                            yAxisColor={theme.colors.border}
+                            xAxisColor={theme.colors.border}
+                            yAxisTextStyle={{ color: theme.colors.textSecondary }}
+                            initialSpacing={0}
+                        />
                     </View>
                 )}
             </View>
         </ScrollView>
     )
 }
+
+//<Text style={[styles.explanationText, { color: theme.colors.textSecondary }]}>This is based on the current wind gusts at 10m and cloud cover under 3km. Night time jumping is not allowed for students. For licensed pilots and tandems, the limits are higher and night time jumping is allowed.</Text>
 
 
 const styles = StyleSheet.create({

@@ -29,6 +29,10 @@ const ChangeInfoScreen = () => {
   const [showALicensePicker, setShowALicensePicker] = useState(false);
   const [showApprovedEquipPicker, setShowApprovedEquipPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showReserveExpiresPicker, setShowReserveExpiresPicker] = useState(false);
+  const [showExitExpiresPicker, setShowExitExpiresPicker] = useState(false);
+  const [showLandingExpiresPicker, setShowLandingExpiresPicker] = useState(false);
+  const [showHealthGuaranteeExpiresPicker, setShowHealthGuaranteeExpiresPicker] = useState(false);
   const { onSave } = route.params || {};
 
   const [form, setForm] = useState({
@@ -61,6 +65,14 @@ const ChangeInfoScreen = () => {
 
     restrictions: "",
     iceContacts: "",
+
+    healthGuaranteeExpires: new Date(),
+
+    //these are different kind of exams that expire if license is a student
+    reserveExpires: new Date(),
+    exitExpires: new Date(),
+    landingExpires: new Date(),
+
   });
 
   const handleChange = (key: keyof typeof form, value: string) => {
@@ -100,6 +112,11 @@ const ChangeInfoScreen = () => {
 
             restrictions: snap.data().restrictions ?? "",
             iceContacts: snap.data().iceContacts ?? "",
+
+            healthGuaranteeExpires: snap.data().healthGuaranteeExpires ?? new Date(),
+            reserveExpires: snap.data().reserveExpires ?? new Date(),
+            exitExpires: snap.data().exitExpires ?? new Date(),
+            landingExpires: snap.data().landingExpires ?? new Date(),
           });
         }
       } catch (err) {
@@ -173,7 +190,9 @@ const ChangeInfoScreen = () => {
           />
 
           {showDatePicker && (
-            <DateTimePicker
+
+            <View>
+              <DateTimePicker
               value={form.dateOfBirth ? new Date(form.dateOfBirth) : new Date()}
               mode="date"
               display="default"
@@ -182,6 +201,48 @@ const ChangeInfoScreen = () => {
                 if (date) handleChange("dateOfBirth", date.toISOString());
               }}
             />
+
+            <DateTimePicker
+              value={form.reserveExpires ? new Date(form.reserveExpires) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowReserveExpiresPicker(false);
+                if (date) handleChange("reserveExpires", date.toISOString());
+              }}
+            />
+
+            <DateTimePicker
+              value={form.landingExpires ? new Date(form.landingExpires) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowLandingExpiresPicker(false);
+                if (date) handleChange("landingExpires", date.toISOString());
+              }}
+            />
+
+            <DateTimePicker
+              value={form.healthGuaranteeExpires ? new Date(form.healthGuaranteeExpires) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowHealthGuaranteeExpiresPicker(false);
+                if (date) handleChange("healthGuaranteeExpires", date.toISOString());
+              }}
+            />
+
+            <DateTimePicker
+              value={form.exitExpires ? new Date(form.exitExpires) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setShowExitExpiresPicker(false);
+                if (date) handleChange("exitExpires", date.toISOString());
+              }}
+            />
+            </View>
+            
           )}
 
 

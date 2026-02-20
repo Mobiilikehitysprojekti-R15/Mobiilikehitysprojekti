@@ -12,6 +12,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { getStorage } from "firebase/storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as Notifications from 'expo-notifications';
 
 type RootStackParamList = {
   Tabs: undefined;
@@ -35,8 +36,71 @@ const ProfileScreen = (props: Props) => {
     notification1: false,
   });
 
+
+  const setExpiryNotification = (notificationKey: string, expiryDate: Date, title: string, body: string) => {
+
+    Notifications.scheduleNotificationAsync({
+              content: {
+                title: title,
+                body: body,
+                data: { screen: "ChangeInfo" },
+                categoryIdentifier: notificationKey,
+              },
+              trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                date: profile?.reserveExpires ? new Date(profile.reserveExpires.getDate() - 3) : new Date(), // 3 days from now
+              }
+            }).then((id) => console.log("Scheduled notification with ID:", id))
+                .catch((error) => console.error("Error scheduling notification:", error));
+  }
+
   const toggleNotification = (key: string) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+
+    if(notifications[key] !== profile?.notifications?.examsExpiring) {
+      updateDoc(doc(db, "users", user?.uid || "",), {
+        notifications: {
+          ...profile?.notifications,
+          examsExpiring: !notifications[key],
+        }
+
+      }).catch((err) => console.error("Failed to update notification setting:", err));
+
+      if (notifications[key]) {
+        Notifications.getNotificationCategoriesAsync().then((categories) => {
+          if (categories.some(category => category.identifier === "examsExpiring")) {
+            console.log("examsExpiring category already exists, skipping creation");
+          }
+          else {
+            Notifications.setNotificationCategoryAsync("examsExpiring", [
+              {
+                identifier: "viewExams",
+                buttonTitle: "View Exams",
+                options: {
+                  opensAppToForeground: true,
+                },
+              }
+            ]);
+            
+            setExpiryNotification("examsExpiring", profile?.reserveExpires ?? new Date(),
+            "Reserve Exam Expiring Soon",
+            "Your reserve exam is expiring in 3 days. Please book a new one to avoid losing your spot.");
+
+            setExpiryNotification("examsExpiring", profile?.landingExpires ?? new Date(),
+            "landing Exam Expiring Soon",
+            "Your reserve exam is expiring in 3 days. Please book a new one to avoid losing your spot.");
+            
+            setExpiryNotification("examsExpiring", profile?.exitExpires ?? new Date(),
+            "exit Exam Expiring Soon",
+            "Your reserve exam is expiring in 3 days. Please book a new one to avoid losing your spot.");
+
+            setExpiryNotification("examsExpiring", profile?.healthGuaranteeExpires ?? new Date(),
+            "Health Guarantee Expiring Soon",
+            "Your health guarantee is expiring in 3 days. Please renew it to avoid losing your spot.");
+          }
+        });
+      }
+    }
   };
 
   const storage = getStorage();
@@ -213,7 +277,7 @@ const ProfileScreen = (props: Props) => {
                   <Text style={[styles.checkmark, { color: theme.colors.surface }]}>✓</Text>
                 )}
               </TouchableOpacity>
-              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Notification 1</Text>
+              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>Set Notifications</Text>
             </View>
           </View>
 

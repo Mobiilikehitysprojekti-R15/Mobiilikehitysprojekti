@@ -21,10 +21,7 @@ export function DropzoneProvider({ children }: DropzoneProviderProps) {
   
 
   useEffect(() => {
-
-    //change this so that the dropzone is taken from firebase if logged in, 
-  // otherwise from storage. If no dropzone is found in storage, 
-  // use the local storage.
+    
     const loadDropzone = async () => {
       try {
 

@@ -103,15 +103,51 @@ export default function App() {
 
 
   return (
+
     <ThemeProvider>
       <AuthProvider>
         <DropzoneProvider>
-          <NavigationContainer>
-            <RootNavigator />
+          <NavigationContainer
+
+            theme={{
+              colors: {
+                primary: "#ff9393",
+                background: "#ff9393",
+                card: "#ff9393",
+
+                text: "#ffffff",
+                border: "#333333",
+                notification: "#ff9393"
+              },
+              dark: true,
+              fonts: {
+                regular: {
+                  fontFamily: "Inter_400Regular",
+                  fontWeight: "400" as "400",
+                },
+                medium: {
+                  fontFamily: "Inter_500Medium",
+                  fontWeight: "500" as "500",
+                },
+                bold: {
+                  fontFamily: "Inter_700Bold",
+                  fontWeight: "700" as "700",
+                },
+                heavy: {
+                  fontFamily: "Inter_800ExtraBold",
+                  fontWeight: "800" as "800",
+                },
+              },
+            }}
+          >
+            <RootNavigator
+
+            />
           </NavigationContainer>
         </DropzoneProvider>
       </AuthProvider>
     </ThemeProvider>
+
   );
 }
 

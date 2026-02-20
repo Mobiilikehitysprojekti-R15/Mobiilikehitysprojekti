@@ -31,35 +31,35 @@ type ThemeContextType = {
 const lightTheme: Theme = {
   colors: {
     background: "#FFFFFF",
-    surface: "#F5F5F5",
+    surface: "#e1c0c0",
     text: "#1E1E1E",
-    textSecondary: "#A9A9A9",
-    primary: "#1E1E1E",
+    textSecondary: "#363636",
+    primary: "#ed8383",
     primaryVariant: "#333333",
     error: "#FF3B30",
     success: "#34C759",
     warning: "#FF9500",
     border: "#E0E0E0",
     tabBarBackground: "#FFFFFF",
-    tabBarActive: "#1E1E1E",
+    tabBarActive: "#ff9393",
     tabBarInactive: "#A9A9A9",
-  },
+  }
 };
 
 const darkTheme: Theme = {
   colors: {
-    background: "#121212",
+    background: "rgb(60, 60, 60)",
     surface: "#1E1E1E",
     text: "#FFFFFF",
     textSecondary: "#A9A9A9",
-    primary: "#FFFFFF",
+    primary: "#ed8383",
     primaryVariant: "#CCCCCC",
     error: "#FF6B6B",
     success: "#4CAF50",
     warning: "#FFB74D",
-    border: "#333333",
+    border: "#978f8f",
     tabBarBackground: "#121212",
-    tabBarActive: "#FFFFFF",
+    tabBarActive: "#ff9393",
     tabBarInactive: "#A9A9A9",
   },
 };

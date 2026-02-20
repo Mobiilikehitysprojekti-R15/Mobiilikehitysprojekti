@@ -8,7 +8,17 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#ff9393",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
       {/* TAB-NAVIGAATIO */}
       <Stack.Screen
         name="Tabs"
@@ -20,7 +30,7 @@ const RootNavigator = () => {
       <Stack.Screen
         name="Stats"
         component={StatsScreen}
-        options={{ title: "Stats" }}
+        options={{ title: "Stats"}}
       />
 
       {/* PROFILE → CHANGE INFO */} 

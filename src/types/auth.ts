@@ -17,7 +17,16 @@ export interface UserProfile {
   notifications?: {
     wind?: boolean;
     weather?: boolean;
+    examsExpiring?: boolean;
   }
+
+
+  healthGuaranteeExpires?: Date;
+  reserveExpires?: Date;
+  exitExpires?: Date;
+  landingExpires?: Date;
+  restrictions?: string;
+  iceContacts?: string;
 }
 
 export interface AuthContextType {

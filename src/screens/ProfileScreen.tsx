@@ -13,7 +13,8 @@ import { getStorage } from "firebase/storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Notifications from 'expo-notifications';
-
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 type RootStackParamList = {
   Tabs: undefined;
   Stats: undefined;
@@ -133,22 +134,23 @@ const ProfileScreen = (props: Props) => {
   }, [user]);
 
   // FETCH JUMPS COUNT
-  useEffect(() => {
-    const fetchJumpCount = async () => {
-      if (!user) return;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchJumpCount = async () => {
+        if (!user) return;
 
-      try {
-        const jumpsRef = collection(db, "jumps");
-        const q = query(jumpsRef, where("userId", "==", user.uid));
-        const snapshot = await getDocs(q);
-        setJumpCount(snapshot.size);
-      } catch (err) {
-        console.error("Failed to fetch jumps:", err);
-      }
-    };
+        try {
+          const jumpsRef = collection(db, "users", user.uid, "jumps");
+          const snapshot = await getDocs(jumpsRef);
+          setJumpCount(snapshot.size);
+        } catch (err) {
+          console.error("Failed to fetch jumps:", err);
+        }
+      };
 
-    fetchJumpCount();
-  }, [user]);
+      fetchJumpCount();
+    }, [user])
+  );
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Not set";

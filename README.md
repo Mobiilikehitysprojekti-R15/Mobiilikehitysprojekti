@@ -37,4 +37,4 @@ The project team consists of the following members:
 
 ## Documentation
 
-Further details about the project’s structure and functionality can be found in the [docs] directory.
+Further details about the project’s structure and functionality can be found in the [docs](./docs) directory.
